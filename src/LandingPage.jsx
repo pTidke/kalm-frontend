@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import "./landing.css";
-import { loadAllSessions, formatDate, deleteSession } from "./storage";
 
 const PERSONAS = [
   {
@@ -8,7 +7,7 @@ const PERSONAS = [
     label: "Buddy",
     tagline: "Straight talk, no BS",
     desc: "Like a trusted coworker who gets it. Plain language, no therapy-speak.",
-    color: "#C4693A",
+    color: "#4A7C6F",
   },
   {
     id: "counselor",
@@ -22,14 +21,14 @@ const PERSONAS = [
     label: "Mindful",
     tagline: "Slow down, breathe",
     desc: "Gentle and grounded. Helps you find stillness when things get heavy.",
-    color: "#5A7FA8",
+    color: "#4A7C6F",
   },
   {
     id: "info",
     label: "Informer",
     tagline: "Just the facts",
     desc: "Clear, no-nonsense info about what you're going through.",
-    color: "#7260A8",
+    color: "#4A7C6F",
   },
 ];
 
@@ -57,42 +56,20 @@ const PersonaIcons = {
   ),
 };
 
-export default function LandingPage({ onStart, onResume, apiBase }) {
+export default function LandingPage({ onStart, apiBase, apiOk, misconfig }) {
   const [selected, setSelected] = useState("mate");
   const [loading, setLoading]   = useState(false);
-  const [apiOk, setApiOk]       = useState(null);
   const [visible, setVisible]   = useState(false);
-  const [recentSessions, setRecentSessions] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     setVisible(true);
-    fetch(`${apiBase}/health`, {
-      headers: { "ngrok-skip-browser-warning": "true" },
-    })
-      .then((r) => r.json())
-      .then(() => setApiOk(true))
-      .catch(() => setApiOk(false));
-      
-    // Load recent chats
-    const sessions = Object.values(loadAllSessions());
-    sessions.sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
-    setRecentSessions(sessions); // show all
-  }, [apiBase]);
+    
+  }, []);
 
   const handleStart = async () => {
     setLoading(true);
     await onStart(selected);
     setLoading(false);
-  };
-
-  const handleDeleteSession = (e, sessionId) => {
-    e.stopPropagation();
-    deleteSession(sessionId);
-    // Reload recent chats
-    const sessions = Object.values(loadAllSessions());
-    sessions.sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
-    setRecentSessions(sessions);
   };
 
   const persona = PERSONAS.find((p) => p.id === selected);
@@ -104,7 +81,11 @@ export default function LandingPage({ onStart, onResume, apiBase }) {
         <div className="logo"><span>K</span>alm</div>
         <div className="tagline-top">Mental Health Support · Construction Workers</div>
         {apiOk === false && (
-          <div className="api-warning">Backend offline — start server first</div>
+          <div className="api-warning">
+            {misconfig
+              ? "⚠ VITE_API_URL not set in Vercel — see deployment guide"
+              : "⚠ Server offline — waking up, click Start to retry"}
+          </div>
         )}
         {apiOk === true && (
           <div className="api-ok">
@@ -119,15 +100,28 @@ export default function LandingPage({ onStart, onResume, apiBase }) {
         <div className="hero-eyebrow">Built for the trades</div>
         <h1 className="hero-title">
           Someone to talk to,<br />
-          <em style={{ color: persona.color }}>no judgment</em>
+          <em>no judgment</em>
         </h1>
         <p className="hero-sub">
           Construction work is tough on your body and your head.
           Kalm is a confidential space to talk through what's going on.
         </p>
 
+        <div className="stats-row">
+          <div className="stat">
+            <span className="stat-num">17.9%</span>
+            <span className="stat-label">of US suicides are construction workers</span>
+          </div>
+          <div className="stat">
+            <span className="stat-num">4×</span>
+            <span className="stat-label">more likely to die by suicide than a work accident</span>
+          </div>
+          <div className="stat">
+            <span className="stat-num">16%</span>
+            <span className="stat-label">of workers experience significant mental distress</span>
+          </div>
+        </div>
       </section>
-
 
       {/* Persona selector */}
       <section className="persona-section">
@@ -137,7 +131,6 @@ export default function LandingPage({ onStart, onResume, apiBase }) {
             <button
               key={p.id}
               className={`persona-card ${selected === p.id ? "active" : ""}`}
-              style={{ "--p-color": p.color, "--p-bg": p.color + "0A", "--p-border": p.color + "33" }}
               onClick={() => setSelected(p.id)}
             >
               <div className="persona-icon">{PersonaIcons[p.id]}</div>
@@ -147,7 +140,7 @@ export default function LandingPage({ onStart, onResume, apiBase }) {
               {selected === p.id && (
                 <div className="persona-check">
                   <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                    <path d="M2 5l2.5 2.5L8 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </div>
               )}
@@ -156,66 +149,10 @@ export default function LandingPage({ onStart, onResume, apiBase }) {
         </div>
       </section>
 
-      {recentSessions.length > 0 && (
-        <section className="recent-chats-section">
-          <div className="recent-chats-header">
-            <div className="section-label">Recent Conversations</div>
-            <div className="recent-chats-search">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              </svg>
-              <input 
-                type="text" 
-                placeholder="Search chats..." 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="recent-chats-grid">
-            {recentSessions.filter(session => {
-              if (!searchQuery) return true;
-              const q = searchQuery.toLowerCase();
-              const pMeta = PERSONAS.find(p => p.id === session.personaId) || PERSONAS[1];
-              return pMeta.label.toLowerCase().includes(q) || session.preview.toLowerCase().includes(q);
-            }).map(session => {
-              const pMeta = PERSONAS.find(p => p.id === session.personaId) || PERSONAS[1];
-              return (
-                <button 
-                  key={session.sessionId} 
-                  className="recent-chat-card"
-                  style={{ "--p-color": pMeta.color, "--p-bg": pMeta.color + "14" }}
-                  onClick={() => onResume(session)}
-                >
-                  <div className="recent-chat-header">
-                    <div className="recent-chat-icon">{PersonaIcons[pMeta.id]}</div>
-                    <div className="recent-chat-meta">
-                      <span className="recent-chat-persona">{pMeta.label}</span>
-                      <span className="recent-chat-time">{formatDate(session.savedAt)}</span>
-                    </div>
-                    <button 
-                      className="recent-chat-delete" 
-                      onClick={(e) => handleDeleteSession(e, session.sessionId)}
-                      aria-label="Delete chat"
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
-                      </svg>
-                    </button>
-                  </div>
-                  <div className="recent-chat-preview">{session.preview}</div>
-                </button>
-              )
-            })}
-          </div>
-        </section>
-      )}
-
       {/* CTA */}
       <section className="cta-section">
         <button
           className="start-btn"
-          style={{ background: persona.color, boxShadow: `0 8px 24px ${persona.color}33` }}
           onClick={handleStart}
           disabled={loading || apiOk === false}
         >
@@ -234,23 +171,20 @@ export default function LandingPage({ onStart, onResume, apiBase }) {
       </section>
 
       {/* Crisis bar */}
-      <div className="crisis-section">
-        <h2 className="crisis-label">Crisis support 24/7</h2>
-        <div className="crisis-list">
-          <div className="crisis-item">
-            988 Suicide &amp; Crisis Lifeline — call or text <strong>988</strong>
-          </div>
-          <div className="crisis-item">
-            Crisis Text Line — text <strong>HOME</strong> to <strong>741741</strong>
-          </div>
-          <div className="crisis-item">
-            Construction Helpline — <strong>(833) 405-0207</strong>
-          </div>
-        </div>
+      <div className="crisis-bar">
+        <span className="crisis-label">Crisis support 24/7</span>
+        <span className="crisis-items">
+          <span>988 Suicide &amp; Crisis Lifeline — call or text <strong>988</strong></span>
+          <span className="crisis-sep">·</span>
+          <span>Crisis Text Line — text <strong>HOME</strong> to <strong>741741</strong></span>
+          <span className="crisis-sep">·</span>
+          <span>Construction Helpline — <strong>(833) 405-0207</strong></span>
+        </span>
       </div>
 
       <footer className="footer">
-        <p>Kalm is not a substitute for professional mental health care. If you're in immediate danger, call <strong>911</strong>.</p>
+        Kalm is not a substitute for professional mental health care.
+        If you're in immediate danger, call <strong>911</strong>.
       </footer>
     </div>
   );
