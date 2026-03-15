@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap");
+
 *,
 *::before,
 *::after {
@@ -15,7 +17,9 @@ html {
 body {
   min-height: 100%;
   width: 100%;
-  background: #f7f5f2;
+  background: #1a2535;
+  color: #f0ede8;
+  font-family: "Inter", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -47,6 +51,6 @@ input {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 4px;
 }
