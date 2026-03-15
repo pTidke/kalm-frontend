@@ -109,6 +109,16 @@ export default function ChatPage({ sessionData, onBack, apiBase }) {
 
   useEffect(() => { inputRef.current?.focus(); }, []);
 
+  // Auto-resize textarea
+  useEffect(() => {
+    const el = inputRef.current;
+    if (el) {
+      el.style.height = "22px";
+      const next = Math.min(el.scrollHeight, 120);
+      el.style.height = next + "px";
+    }
+  }, [input]);
+
   // Rotate placeholder
   useEffect(() => {
     const t = setInterval(() => {
@@ -365,11 +375,6 @@ export default function ChatPage({ sessionData, onBack, apiBase }) {
             placeholder={PLACEHOLDERS[placeholderIdx]}
             rows={1}
             className="chat-input"
-            onInput={e => {
-              e.target.style.height = "24px";
-              const nextHeight = Math.min(e.target.scrollHeight, 120);
-              e.target.style.height = nextHeight + "px";
-            }}
           />
           <button
             className={`send-btn ${input.trim() && !loading ? "ready" : ""}`}

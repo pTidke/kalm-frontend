@@ -670,8 +670,8 @@
   gap: 8px;
   background: var(--bg-surface);
   border: 1.5px solid var(--border);
-  border-radius: 14px;
-  padding: 9px 9px 9px 14px;
+  border-radius: 12px;
+  padding: 6px 6px 6px 12px;
   max-width: 700px;
   margin: 0 auto;
   transition:
@@ -692,22 +692,23 @@
   font-family: "Inter", sans-serif;
   font-size: 15px !important;
   resize: none;
-  height: 24px;
-  line-height: 24px;
+  height: 22px;
+  line-height: 22px;
   max-height: 120px;
   overflow-y: auto;
   caret-color: var(--p-accent);
   scrollbar-width: none;
   padding: 0;
+  margin-bottom: 5px;
 }
 .chat-input::placeholder {
   color: var(--text-dim);
 }
 
 .send-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 9px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   background: var(--bg-hover);
   border: 1px solid var(--border);
   color: var(--text-dim);
