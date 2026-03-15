@@ -266,11 +266,15 @@ export default function ChatPage({ sessionData, onBack, apiBase }) {
 
   // Enter sends, Shift+Enter adds new line
   const handleKey = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    // Only intercept Enter on desktop (non-touch devices)
+    // On mobile, Enter/Return inserts a newline naturally
+    // and the user taps the Send button instead
+    const isMobile = window.matchMedia("(pointer: coarse)").matches;
+    
+    if (e.key === "Enter" && !e.shiftKey && !isMobile) {
       e.preventDefault();
       send(input);
     }
-    // Shift+Enter falls through — browser handles newline naturally
   };
 
   const fmtTime = (d) => {
