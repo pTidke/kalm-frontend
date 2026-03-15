@@ -32,14 +32,15 @@
 
 /* ── Shell ───────────────────────────────────────────────── */
 .chat-shell {
-  height: 100dvh;
   display: flex;
   flex-direction: column;
+  height: 100dvh;
   background: var(--bg-deep);
+  font-family: "Montserrat", sans-serif;
   color: var(--text-primary);
-  font-family: "Inter", sans-serif;
-  padding-top: env(safe-area-inset-top);
   overflow: hidden;
+  position: relative;
+  padding-top: env(safe-area-inset-top);
 }
 
 /* ── Header ──────────────────────────────────────────────── */
@@ -63,7 +64,7 @@
   color: var(--text-secondary);
   border-radius: 8px;
   padding: 7px 11px;
-  font-family: "Inter", sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 13px;
   font-weight: 500;
   transition: all 0.18s;
@@ -232,6 +233,7 @@
   font-size: 13px;
   color: var(--text-secondary);
   line-height: 1.6;
+  font-weight: 500;
 }
 .info-panel strong {
   color: var(--text-primary);
@@ -322,7 +324,7 @@
   text-align: left;
   transition: all 0.16s;
   width: 100%;
-  font-family: "Inter", sans-serif;
+  font-family: "Montserrat", sans-serif;
 }
 .history-item:hover {
   border-color: var(--h-accent, var(--steel));
@@ -464,7 +466,7 @@
   color: var(--text-secondary);
   border-radius: 10px;
   padding: 11px;
-  font-family: "Inter", sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 14px;
   transition: all 0.18s;
 }
@@ -570,6 +572,7 @@
   line-height: 1.65;
   color: var(--text-primary);
   white-space: pre-wrap;
+  font-weight: 500;
 }
 .bubble-time {
   font-family: "DM Mono", monospace;
@@ -643,7 +646,7 @@
   border-radius: 9px;
   padding: 10px 13px;
   color: var(--text-secondary);
-  font-family: "Inter", sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 13px;
   text-align: left;
   transition: all 0.16s;
@@ -689,8 +692,9 @@
   border: none;
   outline: none;
   color: var(--text-primary);
-  font-family: "Inter", sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 15px !important;
+  font-weight: 500;
   resize: none;
   height: 22px;
   line-height: 22px;

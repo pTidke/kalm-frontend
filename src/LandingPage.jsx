@@ -75,12 +75,13 @@ const TABS = [
 
 const PersonaIcons = {
   mate: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-      <circle cx="9" cy="7" r="4"/>
-      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 18h20"/>
+      <path d="M20 18v-2a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v2"/>
+      <path d="M12 14V4c0-1.1.9-2 2-2h4a1 1 0 0 1 1 1v1"/>
+      <path d="M4 16c0-4.4 3.6-8 8-8s8 3.6 8 8"/>
+      <path d="M12 8V4"/>
     </svg>
   ),
   counselor: (
@@ -540,8 +541,8 @@ export default function LandingPage({ onStart, apiBase, apiOk, misconfig }) {
         </h1>
         <p className="hero-tagline">Built for the ones who build.</p>
         <p className="hero-sub">
-          Step inside. Talk it out. Private, confidential,
-          and built for people who work with their hands.
+          In the middle of the noise, pressure, and long shifts, it’s your trailer — a place to talk freely, reset your mind, get real support, and walk back stronger. No judgment. No labels. Just a quiet space that’s yours.
+
         </p>
         <div className="stats-row">
           <div className="stat">
@@ -550,7 +551,7 @@ export default function LandingPage({ onStart, apiBase, apiOk, misconfig }) {
           </div>
           <div className="stat">
             <span className="stat-num">4×</span>
-            <span className="stat-label">more likely to die by suicide than a work accident</span>
+            <span className="stat-label">more likely to die by suicide than a work related accident</span>
           </div>
           <div className="stat">
             <span className="stat-num">16%</span>
