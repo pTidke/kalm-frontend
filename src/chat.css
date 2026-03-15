@@ -96,6 +96,12 @@
   flex-shrink: 0;
 }
 
+.header-icon img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
 .header-name {
   font-size: 16px;
   font-weight: 700;
@@ -522,6 +528,12 @@
   color: var(--p-accent);
 }
 
+.bot-avatar img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
 .bubble {
   max-width: 74%;
   padding: 11px 15px;
@@ -680,11 +692,13 @@
   font-family: "Inter", sans-serif;
   font-size: 15px !important;
   resize: none;
-  line-height: 1.5;
+  height: 24px;
+  line-height: 24px;
   max-height: 120px;
   overflow-y: auto;
   caret-color: var(--p-accent);
   scrollbar-width: none;
+  padding: 0;
 }
 .chat-input::placeholder {
   color: var(--text-dim);

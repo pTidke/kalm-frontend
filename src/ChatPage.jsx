@@ -42,21 +42,9 @@ const Icons = {
   phone: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.62 3.38 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.06-1.06a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>,
 };
 
-// Trailer door icon (reused from landing)
-const TrailerIcon = ({ size = 18 }) => (
-  <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
-    <rect x="2" y="8" width="28" height="18" rx="1.5"
-      stroke="currentColor" strokeWidth="1.6" fill="none"/>
-    <circle cx="8" cy="26" r="2.2" stroke="currentColor" strokeWidth="1.4" fill="none"/>
-    <circle cx="24" cy="26" r="2.2" stroke="currentColor" strokeWidth="1.4" fill="none"/>
-    <rect x="12" y="12" width="8" height="11" rx="0.5"
-      stroke="currentColor" strokeWidth="1.4" fill="none"/>
-    <line x1="19.5" y1="12.5" x2="19.5" y2="22.5"
-      stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.5"/>
-    <circle cx="13.5" cy="17.5" r="0.8" fill="currentColor"/>
-    <line x1="2" y1="17" x2="0" y2="17"
-      stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
-  </svg>
+// Logo component
+const Logo = ({ size = 18 }) => (
+  <img src="/logo.png" alt="Logo" style={{ width: size, height: size, objectFit: "contain" }} />
 );
 
 // Storage helpers
@@ -207,7 +195,7 @@ export default function ChatPage({ sessionData, onBack, apiBase }) {
           {Icons.back} Back
         </button>
         <div className="header-identity">
-          <div className="header-icon"><TrailerIcon size={18} /></div>
+          <div className="header-icon"><Logo size={20} /></div>
           <div>
             <div className="header-name">MyTrailer</div>
             <div className="header-sub">{p.mode}</div>
@@ -332,7 +320,7 @@ export default function ChatPage({ sessionData, onBack, apiBase }) {
             <div key={msg.id}
               className={`message-row ${msg.role === "user" ? "user-row" : "bot-row"}`}>
               {msg.role === "assistant" && (
-                <div className="bot-avatar"><TrailerIcon size={16} /></div>
+                <div className="bot-avatar"><Logo size={18} /></div>
               )}
               <div className={`bubble ${msg.role === "user" ? "user-bubble" : "bot-bubble"} ${msg.error ? "error-bubble" : ""}`}>
                 <p className="bubble-text">{msg.content}</p>
@@ -342,7 +330,7 @@ export default function ChatPage({ sessionData, onBack, apiBase }) {
           ))}
           {loading && (
             <div className="message-row bot-row">
-              <div className="bot-avatar"><TrailerIcon size={16} /></div>
+              <div className="bot-avatar"><Logo size={18} /></div>
               <div className="bubble bot-bubble typing-bubble">
                 <span/><span/><span/>
               </div>
@@ -378,8 +366,9 @@ export default function ChatPage({ sessionData, onBack, apiBase }) {
             rows={1}
             className="chat-input"
             onInput={e => {
-              e.target.style.height = "auto";
-              e.target.style.height = Math.min(e.target.scrollHeight, 120) + "px";
+              e.target.style.height = "24px";
+              const nextHeight = Math.min(e.target.scrollHeight, 120);
+              e.target.style.height = nextHeight + "px";
             }}
           />
           <button
