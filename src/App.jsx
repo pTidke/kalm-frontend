@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import LandingPage from "./LandingPage";
 import ChatPage from "./ChatPage";
+import Entrance from "./Entrance";
 
 const API_HEADERS = {
   "Content-Type": "application/json",
@@ -15,6 +16,9 @@ export default function App() {
   const [waking, setWaking]           = useState(false);
   const [apiOk, setApiOk]             = useState(null);
   const [misconfig, setMisconfig]     = useState(false);
+  const [showEntrance, setShowEntrance] = useState(
+    !sessionStorage.getItem("mytrailer_visited")
+  );
 
   useEffect(() => {
     if (!apiBase) { setMisconfig(true); setApiOk(false); return; }
@@ -107,8 +111,14 @@ export default function App() {
     );
   }
 
+  const handleEntranceComplete = () => {
+    setShowEntrance(false);
+    sessionStorage.setItem("mytrailer_visited", "true");
+  };
+
   return (
     <div>
+      {showEntrance && <Entrance onComplete={handleEntranceComplete} />}
       {page === "landing" ? (
         <LandingPage
           onStart={handleStart}

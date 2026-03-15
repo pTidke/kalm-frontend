@@ -54,3 +54,57 @@ input {
   background: rgba(255, 255, 255, 0.08);
   border-radius: 4px;
 }
+/* ── Entrance Animation ───────────────────────────────────── */
+.entrance-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  pointer-events: none;
+  perspective: 1200px;
+}
+
+.entrance-door {
+  flex: 1;
+  background: #1a2535;
+  height: 100%;
+  position: relative;
+  transition: transform 1.2s cubic-bezier(0.7, 0, 0.3, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.door-left {
+  transform-origin: left;
+  border-right: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.door-right {
+  transform-origin: right;
+  border-left: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.entrance-overlay.is-open .door-left {
+  transform: rotateY(-110deg);
+}
+
+.entrance-overlay.is-open .door-right {
+  transform: rotateY(110deg);
+}
+
+.entrance-logo {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+  z-index: 10000;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.entrance-overlay.is-open .entrance-logo {
+  opacity: 0;
+}
