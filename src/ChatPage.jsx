@@ -7,10 +7,10 @@ const API_HEADERS = {
 };
 
 const PERSONA_META = {
-  mate:      { label: "Buddy",     mode: "Buddy",     accent: "#C4693A", bg: "rgba(196,105,58,0.12)",  border: "rgba(196,105,58,0.25)",  bubble: "#C4693A" },
-  counselor: { label: "Counselor", mode: "Counselor", accent: "#2E8B80", bg: "rgba(46,139,128,0.12)",  border: "rgba(46,139,128,0.25)",  bubble: "#2E8B80" },
-  mindful:   { label: "Mindful",   mode: "Mindful",   accent: "#4A6FA5", bg: "rgba(74,111,165,0.12)",  border: "rgba(74,111,165,0.25)",  bubble: "#4A6FA5" },
-  info:      { label: "Informer",  mode: "Informer",  accent: "#7B68C8", bg: "rgba(123,104,200,0.12)", border: "rgba(123,104,200,0.25)", bubble: "#7B68C8" },
+  mate:      { label: "Buddy",     mode: "Buddy",     accent: "#B85C2A", bg: "rgba(184,92,42,0.12)",  border: "rgba(184,92,42,0.25)",  bubble: "#B85C2A" },
+  counselor: { label: "Counselor", mode: "Counselor", accent: "#1E7A6E", bg: "rgba(30,122,110,0.12)",  border: "rgba(30,122,110,0.25)",  bubble: "#1E7A6E" },
+  mindful:   { label: "Mindful",   mode: "Mindful",   accent: "#2B4C7E", bg: "rgba(43,76,126,0.12)",  border: "rgba(43,76,126,0.25)",  bubble: "#2B4C7E" },
+  info:      { label: "Informer",  mode: "Informer",  accent: "#5B4FA8", bg: "rgba(91,79,168,0.12)",  border: "rgba(91,79,168,0.25)",  bubble: "#5B4FA8" },
 };
 
 const STAGE_LABELS = {

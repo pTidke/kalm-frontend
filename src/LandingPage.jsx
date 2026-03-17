@@ -7,29 +7,31 @@ const PERSONAS = [
     label: "Buddy",
     tagline: "No BS, straight talk",
     desc: "Talks like a coworker. Plain language, no therapy-speak.",
-    color: "#C4693A",
+    color: "#B85C2A",
   },
+  /*
   {
     id: "counselor",
     label: "Counselor",
     tagline: "Steady and direct",
     desc: "Calm, focused. Helps you work through it without the fluff.",
-    color: "#2E8B80",
+    color: "#1E7A6E",
   },
   {
     id: "mindful",
     label: "Mindful",
     tagline: "Quiet, no pressure",
     desc: "Slows things down. Good when your head won't stop.",
-    color: "#4A6FA5",
+    color: "#2B4C7E",
   },
   {
     id: "info",
     label: "Informer",
     tagline: "Just the facts",
-    desc: "Straight answers about what you're going through.",
-    color: "#7B68C8",
+    desc: "Clear, simple explanations of what's happening and why.",
+    color: "#5B4FA8",
   },
+  */
 ];
 
 const TABS = [
@@ -320,7 +322,6 @@ function LoginModal({ onClose }) {
 /* ── Top Nav Bar ──────────────────────────────────────────── */
 function TopBar({ activeTab, onTabChange, apiOk, misconfig, onLoginClick }) {
   const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -328,18 +329,12 @@ function TopBar({ activeTab, onTabChange, apiOk, misconfig, onLoginClick }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close menu on tab select
-  const handleTabChange = (id) => {
-    onTabChange(id);
-    setMenuOpen(false);
-  };
-
   return (
-    <header className={`topbar ${scrolled ? "topbar-scrolled" : ""} ${menuOpen ? "menu-open" : ""}`}>
-      {/* Single row: logo | tabs (desktop) | actions | hamburger (mobile) */}
+    <header className={`topbar ${scrolled ? "topbar-scrolled" : ""}`}>
+      {/* Single row: logo | tabs (desktop) | actions */}
       <div className="topbar-inner">
-        {/* Brand name as home link, logo image removed as requested */}
-        <button className="logo" onClick={() => handleTabChange("talk")} aria-label="Go to home">
+        {/* Brand name as home link */}
+        <button className="logo" onClick={() => onTabChange("talk")} aria-label="Go to home">
           <span className="logo-text">MyTrailer</span>
         </button>
 
@@ -351,7 +346,7 @@ function TopBar({ activeTab, onTabChange, apiOk, misconfig, onLoginClick }) {
               role="tab"
               aria-selected={activeTab === tab.id}
               className={`tab-item ${activeTab === tab.id ? "active" : ""}`}
-              onClick={() => handleTabChange(tab.id)}
+              onClick={() => onTabChange(tab.id)}
             >
               <span className="tab-icon">{tab.icon}</span>
               <span className="tab-label">{tab.label}</span>
@@ -380,37 +375,27 @@ function TopBar({ activeTab, onTabChange, apiOk, misconfig, onLoginClick }) {
             </svg>
             <span className="login-btn-label">Sign In</span>
           </button>
-
-          {/* Hamburger — mobile only */}
-          <button
-            className={`hamburger ${menuOpen ? "is-open" : ""}`}
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={menuOpen}
-          >
-            <span/><span/><span/>
-          </button>
         </div>
       </div>
-
-      {/* Mobile dropdown drawer */}
-      {menuOpen && (
-        <nav className="mobile-menu" role="tablist" aria-label="Mobile navigation">
-          {TABS.map((tab) => (
-            <button
-              key={tab.id}
-              role="tab"
-              aria-selected={activeTab === tab.id}
-              className={`mobile-menu-item ${activeTab === tab.id ? "active" : ""}`}
-              onClick={() => handleTabChange(tab.id)}
-            >
-              <span className="tab-icon">{tab.icon}</span>
-              {tab.label}
-            </button>
-          ))}
-        </nav>
-      )}
     </header>
+  );
+}
+
+/* ── Bottom Nav Bar (Mobile) ──────────────────────────────── */
+function BottomBar({ activeTab, onTabChange }) {
+  return (
+    <nav className="bottom-nav">
+      {TABS.map((tab) => (
+        <button
+          key={tab.id}
+          className={`bottom-nav-item ${activeTab === tab.id ? "active" : ""}`}
+          onClick={() => onTabChange(tab.id)}
+        >
+          <span className="bottom-nav-icon">{tab.icon}</span>
+          <span className="bottom-nav-label">{tab.label}</span>
+        </button>
+      ))}
+    </nav>
   );
 }
 
@@ -445,7 +430,86 @@ export default function LandingPage({ onStart, apiBase, apiOk, misconfig }) {
   if (activeTab !== "talk") {
     const data = ContentData[activeTab];
     return (
-      <div className="tab-page-container">
+      <>
+        <div className="tab-page-container">
+          <TopBar
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            apiOk={apiOk}
+            misconfig={misconfig}
+            onLoginClick={() => setShowLogin(true)}
+          />
+          <main className="tab-content">
+            <header className="tab-header">
+              <h1 className="tab-title">{data.title}</h1>
+              <p className="tab-subtitle">{data.subtitle}</p>
+            </header>
+
+            {activeTab === "reset" && (
+              <div className="reset-grid">
+                {data.items.map(item => (
+                  <button key={item.id} className="reset-card">
+                    <div className="reset-card-meta">
+                      <span className="reset-card-type">{item.type}</span>
+                      <span className="reset-card-time">{item.time}</span>
+                    </div>
+                    <h3 className="reset-card-title">{item.title}</h3>
+                    <p className="reset-card-desc">{item.desc}</p>
+                    <div className="reset-card-cta">Start Exercise →</div>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {activeTab === "toolbox" && (
+              <div className="toolbox-list">
+                {data.categories.map((cat, idx) => (
+                  <div key={idx} className="toolbox-cat">
+                    <h3 className="toolbox-cat-label">{cat.label}</h3>
+                    <div className="toolbox-links">
+                      {cat.links.map((link, lidx) => (
+                        <a key={lidx} href="#" className={`toolbox-link ${link.urgent ? "urgent" : ""}`}>
+                          <div className="link-info">
+                            <span className="link-name">{link.name}</span>
+                            <span className="link-text">{link.text}</span>
+                          </div>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                            <polyline points="15 3 21 3 21 9" />
+                            <line x1="10" y1="14" x2="21" y2="3" />
+                          </svg>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {activeTab === "checkin" && (
+              <div className="checkin-container">
+                <div className="checkin-grid">
+                  {data.options.map(opt => (
+                    <button key={opt.level} className="checkin-opt">
+                      <span className="checkin-icon">{opt.icon}</span>
+                      <span className="checkin-label">{opt.label}</span>
+                    </button>
+                  ))}
+                </div>
+                <p className="checkin-note">Your check-ins are private and stay on this device.</p>
+              </div>
+            )}
+          </main>
+          {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
+        </div>
+        <BottomBar activeTab={activeTab} onTabChange={setActiveTab} />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div className={`landing ${visible ? "visible" : ""}`}>
         <TopBar
           activeTab={activeTab}
           onTabChange={setActiveTab}
@@ -453,182 +517,95 @@ export default function LandingPage({ onStart, apiBase, apiOk, misconfig }) {
           misconfig={misconfig}
           onLoginClick={() => setShowLogin(true)}
         />
-        <main className="tab-content">
-          <header className="tab-header">
-            <h1 className="tab-title">{data.title}</h1>
-            <p className="tab-subtitle">{data.subtitle}</p>
-          </header>
 
-          {activeTab === "reset" && (
-            <div className="reset-grid">
-              {data.items.map(item => (
-                <button key={item.id} className="reset-card">
-                  <div className="reset-card-meta">
-                    <span className="reset-card-type">{item.type}</span>
-                    <span className="reset-card-time">{item.time}</span>
-                  </div>
-                  <h3 className="reset-card-title">{item.title}</h3>
-                  <p className="reset-card-desc">{item.desc}</p>
-                  <div className="reset-card-cta">Start Exercise →</div>
-                </button>
-              ))}
-            </div>
-          )}
+        <main className="hero">
+          <div className="hero-logo-wrap">
+            <img src="/logo.png" alt="MyTrailer" className="hero-logo-img" />
+          </div>
 
-          {activeTab === "toolbox" && (
-            <div className="toolbox-list">
-              {data.categories.map((cat, idx) => (
-                <div key={idx} className="toolbox-cat">
-                  <h3 className="toolbox-cat-label">{cat.label}</h3>
-                  <div className="toolbox-links">
-                    {cat.links.map((link, lidx) => (
-                      <a key={lidx} href="#" className={`toolbox-link ${link.urgent ? "urgent" : ""}`}>
-                        <div className="link-info">
-                          <span className="link-name">{link.name}</span>
-                          <span className="link-text">{link.text}</span>
-                        </div>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                          <polyline points="15 3 21 3 21 9" />
-                          <line x1="10" y1="14" x2="21" y2="3" />
-                        </svg>
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {activeTab === "checkin" && (
-            <div className="checkin-container">
-              <div className="checkin-grid">
-                {data.options.map(opt => (
-                  <button key={opt.level} className="checkin-opt">
-                    <span className="checkin-icon">{opt.icon}</span>
-                    <span className="checkin-label">{opt.label}</span>
-                  </button>
-                ))}
-              </div>
-              <p className="checkin-note">Your check-ins are private and stay on this device.</p>
-            </div>
-          )}
+          <div className="hero-eyebrow">A quiet space for you</div>
+          <h1 className="hero-title">
+            Your space <br/>
+            <em>on site.</em>
+          </h1>
+          <div className="hero-tagline">BUILT FOR THE ONES WHO BUILD.</div>
+          <p className="hero-sub">
+            In the middle of the noise, pressure, and long shifts, it’s your trailer — a place to talk freely, reset your mind, get real support, and walk back stronger. No judgment. No labels. Just a quiet space that’s yours.
+          </p>
         </main>
+
+        {/* Persona selector */}
+        <section className="persona-section">
+          <div className="section-label">How do you want to talk?</div>
+          <div className="persona-grid">
+            {PERSONAS.map((p) => (
+              <button
+                key={p.id}
+                className={`persona-card ${selected === p.id ? "active" : ""}`}
+                style={{ "--p-color": p.color }}
+                onClick={() => setSelected(p.id)}
+              >
+                <div className="persona-icon">{PersonaIcons[p.id]}</div>
+                <div className="persona-content">
+                  <div className="persona-label">{p.label}</div>
+                  <div className="persona-tagline">{p.tagline}</div>
+                  <div className="persona-desc">{p.desc}</div>
+                </div>
+                {selected === p.id && (
+                  <div className="persona-check">
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                      <path d="M2 5l2.5 2.5L8 3" stroke="white"
+                        strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section className="cta-section">
+          <button
+            className="start-btn"
+            onClick={handleStart}
+            disabled={loading || apiOk === false}
+          >
+            {loading ? (
+              <span className="btn-loading"><span/><span/><span/></span>
+            ) : (
+              <>
+                Step Inside
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                  className="btn-arrow">
+                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor"
+                    strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </>
+            )}
+          </button>
+          <p className="cta-note">Private · Confined to this device</p>
+        </section>
+
+        {/* Crisis bar */}
+        <div className="crisis-bar">
+          <span className="crisis-label">Crisis support 24/7</span>
+          <span className="crisis-items">
+            <span>988 Lifeline — call or text <strong>988</strong></span>
+            <span className="crisis-sep">·</span>
+            <span>Crisis Text — text <strong>HOME</strong> to <strong>741741</strong></span>
+            <span className="crisis-sep">·</span>
+            <span>Construction Helpline — <strong>(833) 405-0207</strong></span>
+          </span>
+          <div className="crisis-disclaimer">
+            MyTrailer is not a substitute for professional mental health care.
+            In immediate danger, call <strong>911</strong>.
+          </div>
+        </div>
+
         {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
       </div>
-    );
-  }
-
-  return (
-    <div className={`landing ${visible ? "visible" : ""}`}>
-            <TopBar
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        apiOk={apiOk}
-        misconfig={misconfig}
-        onLoginClick={() => setShowLogin(true)}
-      />
-
-      {/* Hero */}
-      <section className="hero">
-        <div className="hero-logo-wrap">
-          <img src="/logo.png" alt="MyTrailer Logo" className="hero-logo-img" />
-        </div>
-        <div className="hero-eyebrow">Built for the ones who build</div>
-        <h1 className="hero-title">
-          Your space<br />
-          <em>on site.</em>
-        </h1>
-        <p className="hero-tagline">Built for the ones who build.</p>
-        <p className="hero-sub">
-          In the middle of the noise, pressure, and long shifts, it’s your trailer — a place to talk freely, reset your mind, get real support, and walk back stronger. No judgment. No labels. Just a quiet space that’s yours.
-
-        </p>
-        <div className="stats-row">
-          <div className="stat">
-            <span className="stat-num">17.9%</span>
-            <span className="stat-label">of US work suicides are construction workers</span>
-          </div>
-          <div className="stat">
-            <span className="stat-num">4×</span>
-            <span className="stat-label">more likely to die by suicide than a work related accident</span>
-          </div>
-          <div className="stat">
-            <span className="stat-num">16%</span>
-            <span className="stat-label">of workers experience significant mental distress</span>
-          </div>
-        </div>
-      </section>
-
-      {/* Persona selector */}
-      <section className="persona-section">
-        <div className="section-label">How do you want to talk?</div>
-        <div className="persona-grid">
-          {PERSONAS.map((p) => (
-            <button
-              key={p.id}
-              className={`persona-card ${selected === p.id ? "active" : ""}`}
-              style={{ "--p-color": p.color }}
-              onClick={() => setSelected(p.id)}
-            >
-              <div className="persona-icon">{PersonaIcons[p.id]}</div>
-              <div className="persona-label">{p.label}</div>
-              <div className="persona-tagline">{p.tagline}</div>
-              <div className="persona-desc">{p.desc}</div>
-              {selected === p.id && (
-                <div className="persona-check">
-                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                    <path d="M2 5l2.5 2.5L8 3" stroke="white"
-                      strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-              )}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="cta-section">
-        <button
-          className="start-btn"
-          onClick={handleStart}
-          disabled={loading || apiOk === false}
-        >
-          {loading ? (
-            <span className="btn-loading"><span/><span/><span/></span>
-          ) : (
-            <>
-              Step Inside
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
-                className="btn-arrow">
-                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor"
-                  strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </>
-          )}
-        </button>
-        <p className="cta-note">Private · Confined to this device</p>
-      </section>
-
-      {/* Crisis bar */}
-      <div className="crisis-bar">
-        <span className="crisis-label">Crisis support 24/7</span>
-        <span className="crisis-items">
-          <span>988 Lifeline — call or text <strong>988</strong></span>
-          <span className="crisis-sep">·</span>
-          <span>Crisis Text — text <strong>HOME</strong> to <strong>741741</strong></span>
-          <span className="crisis-sep">·</span>
-          <span>Construction Helpline — <strong>(833) 405-0207</strong></span>
-        </span>
-      </div>
-
-      <footer className="footer">
-        MyTrailer is not a substitute for professional mental health care.
-        In immediate danger, call <strong>911</strong>.
-      </footer>
-
-      {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
-    </div>
+      <BottomBar activeTab={activeTab} onTabChange={setActiveTab} />
+    </>
   );
 }

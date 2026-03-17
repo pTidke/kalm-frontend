@@ -17,7 +17,7 @@
   --text-secondary: #8c97a8;
   --text-dim: #56647a;
   --steel: #4a6fa5;
-  --orange: #e8680a;
+  --orange: #ffb300;
   --teal: #2e8b80;
   --danger: #e05252;
   --border: rgba(255, 255, 255, 0.07);
@@ -28,6 +28,22 @@
   --p-bg: rgba(74, 111, 165, 0.12);
   --p-border: rgba(74, 111, 165, 0.25);
   --p-bubble: #4a6fa5;
+}
+
+:root[data-theme="light"] {
+  --bg-deep: #f2efe9;
+  --bg-mid: #e8e4dc;
+  --bg-surface: #dedad1;
+  --bg-hover: #d4cfc5;
+  --text-primary: #1c2333;
+  --text-secondary: #5a6070;
+  --text-dim: #8c929e;
+  --steel: #2b4c7e;
+  --orange: #ffb300;
+  --teal: #1e7a6e;
+  --danger: #c0392b;
+  --border: rgba(28, 35, 51, 0.08);
+  --border-active: rgba(43, 76, 126, 0.3);
 }
 
 /* ── Shell ───────────────────────────────────────────────── */
@@ -72,7 +88,8 @@
   flex-shrink: 0;
 }
 .back-btn:hover {
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: var(--border-active);
+  background: var(--bg-hover);
   color: var(--text-primary);
 }
 
@@ -178,7 +195,8 @@
   flex-shrink: 0;
 }
 .icon-btn:hover {
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: var(--border-active);
+  background: var(--bg-hover);
   color: var(--text-primary);
 }
 .icon-btn.small {
@@ -730,7 +748,7 @@
   cursor: pointer;
 }
 .send-btn.ready:hover {
-  background: #d45c06;
+  background: #e6a200;
   transform: scale(1.04);
 }
 

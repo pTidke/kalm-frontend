@@ -8,6 +8,16 @@
   padding: 0;
 }
 
+:root {
+  --bg-deep: #1a2535;
+  --text-primary: #f0ede8;
+}
+
+:root[data-theme="light"] {
+  --bg-deep: #f2efe9;
+  --text-primary: #1c2333;
+}
+
 html {
   height: 100%;
   width: 100%;
@@ -17,8 +27,8 @@ html {
 body {
   min-height: 100%;
   width: 100%;
-  background: #1a2535;
-  color: #f0ede8;
+  background: var(--bg-deep);
+  color: var(--text-primary);
   font-family: "Montserrat", sans-serif;
   font-weight: 500;
   -webkit-font-smoothing: antialiased;
@@ -67,7 +77,7 @@ input {
 
 .entrance-door {
   flex: 1;
-  background: #1a2535;
+  background: var(--bg-deep);
   height: 100%;
   position: relative;
   transition: transform 1.2s cubic-bezier(0.7, 0, 0.3, 1);

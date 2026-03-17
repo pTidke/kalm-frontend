@@ -80,23 +80,23 @@ export default function App() {
       <div style={{
         height: "100dvh", display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "center",
-        background: "#1A2535", fontFamily: "'Inter', sans-serif",
+        background: "var(--bg-deep)", fontFamily: "'Inter', sans-serif",
         gap: 16, padding: 24,
       }}>
         <div style={{ display: "flex", gap: 8, marginBottom: 4 }}>
           {[0,1,2].map(i => (
             <div key={i} style={{
               width: 10, height: 10, borderRadius: "50%",
-              background: "#E8680A",
+              background: "var(--orange)",
               animation: "bounce 1.2s ease-in-out infinite",
               animationDelay: `${i * 0.2}s`,
             }}/>
           ))}
         </div>
-        <p style={{ fontSize: 15, color: "#F0EDE8", fontWeight: 600 }}>
+        <p style={{ fontSize: 15, color: "var(--text-primary)", fontWeight: 600 }}>
           Starting up MyTrailer...
         </p>
-        <p style={{ fontSize: 13, color: "#56647A", textAlign: "center",
+        <p style={{ fontSize: 13, color: "var(--text-secondary)", textAlign: "center",
           maxWidth: 280, lineHeight: 1.6 }}>
           The server is waking up after a period of inactivity.
           This takes about 30 seconds — just the once.
