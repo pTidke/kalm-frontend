@@ -115,7 +115,6 @@ function TypedText({ text, onDone }) {
 
   useEffect(() => {
     idx.current = 0;
-    setDisplayed("");
     // Finish in ~2–3s regardless of length
     const speed = Math.max(4, Math.min(25, 2400 / text.length));
     const timer = setInterval(() => {
@@ -143,6 +142,20 @@ const STORAGE_KEY = "mytrailer_chat_sessions";
 function loadAllSessions() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
   catch { return {}; }
+}
+
+function deleteSession(sessionId) {
+  try {
+    const all = loadAllSessions();
+    delete all[sessionId];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+  } catch (e) {
+    console.warn("Storage error:", e);
+  }
+}
+
+function clearAllSessions() {
+  try { localStorage.removeItem(STORAGE_KEY); } catch (e) { console.warn(e); }
 }
 
 function saveSession(sessionId, personaId, messages) {
@@ -204,6 +217,7 @@ export default function ChatPage({ sessionData, onBack, apiBase }) {
   const [pastSessions, setPastSessions] = useState({});
   const [placeholderIdx, setPlaceholderIdx] = useState(0);
   const [lastFailedText, setLastFailedText] = useState(null);
+  const [historySearch, setHistorySearch]   = useState("");
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -408,55 +422,109 @@ export default function ChatPage({ sessionData, onBack, apiBase }) {
           >
             <div className="history-header">
               <span className="history-title">Previous conversations</span>
-              <button
-                className="icon-btn small"
-                onClick={() => setShowHistory(false)}
-              >
-                {Icons.close}
-              </button>
+              <div className="history-header-actions">
+                {Object.values(pastSessions).length > 0 && (
+                  <button
+                    className="history-clear-btn"
+                    onClick={() => {
+                      clearAllSessions();
+                      setPastSessions({});
+                      setHistorySearch("");
+                    }}
+                  >
+                    Clear all
+                  </button>
+                )}
+                <button className="icon-btn small" onClick={() => setShowHistory(false)}>
+                  {Icons.close}
+                </button>
+              </div>
             </div>
+
+            {Object.values(pastSessions).length > 0 && (
+              <div className="history-search-wrap">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input
+                  className="history-search"
+                  type="text"
+                  placeholder="Search conversations…"
+                  value={historySearch}
+                  onChange={e => setHistorySearch(e.target.value)}
+                  autoFocus
+                />
+                {historySearch && (
+                  <button className="history-search-clear" onClick={() => setHistorySearch("")}>
+                    {Icons.close}
+                  </button>
+                )}
+              </div>
+            )}
+
             <div className="history-list">
-              {Object.values(pastSessions).length === 0 ? (
-                <div className="history-empty">
-                  No saved conversations yet
-                </div>
-              ) : (
-                Object.values(pastSessions)
-                  .sort((a, b) =>
-                    new Date(b.savedAt) - new Date(a.savedAt)
-                  )
-                  .map(session => {
-                    const meta =
-                      PERSONA_META[session.personaId] ||
-                      PERSONA_META.mack;
-                    return (
+              {(() => {
+                const q = historySearch.toLowerCase().trim();
+                const all = Object.values(pastSessions)
+                  .sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt))
+                  .filter(s => !q ||
+                    s.preview?.toLowerCase().includes(q) ||
+                    (PERSONA_META[s.personaId]?.label || "").toLowerCase().includes(q) ||
+                    s.messages?.some(m => m.content?.toLowerCase().includes(q))
+                  );
+
+                if (Object.values(pastSessions).length === 0)
+                  return <div className="history-empty">No saved conversations yet</div>;
+                if (all.length === 0)
+                  return <div className="history-empty">No results for "{historySearch}"</div>;
+
+                return all.map(session => {
+                  const meta = PERSONA_META[session.personaId] || PERSONA_META.mack;
+                  return (
+                    <div
+                      key={session.sessionId}
+                      className="history-item"
+                      style={{ "--h-accent": meta.accent }}
+                    >
                       <button
-                        key={session.sessionId}
-                        className="history-item"
-                        style={{ "--h-accent": meta.accent }}
+                        className="history-item-body"
                         onClick={() => loadSession(session)}
                       >
                         <div className="history-item-dot" />
                         <div className="history-item-content">
                           <div className="history-item-meta">
-                            <span className="history-item-persona">
-                              {meta.label}
-                            </span>
-                            <span className="history-item-time">
-                              {formatDate(session.savedAt)}
-                            </span>
+                            <span className="history-item-persona">{meta.label}</span>
+                            <span className="history-item-time">{formatDate(session.savedAt)}</span>
                           </div>
-                          <div className="history-item-preview">
-                            {session.preview}
-                          </div>
-                          <div className="history-item-count">
-                            {session.messages.length} messages
-                          </div>
+                          <div className="history-item-preview">{session.preview}</div>
+                          <div className="history-item-count">{session.messages.length} messages</div>
                         </div>
                       </button>
-                    );
-                  })
-              )}
+                      <button
+                        className="history-item-delete"
+                        title="Delete"
+                        onClick={() => {
+                          deleteSession(session.sessionId);
+                          setPastSessions(prev => {
+                            const next = { ...prev };
+                            delete next[session.sessionId];
+                            return next;
+                          });
+                        }}
+                      >
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="3 6 5 6 21 6"/>
+                          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                          <path d="M10 11v6M14 11v6"/>
+                          <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                        </svg>
+                      </button>
+                    </div>
+                  );
+                });
+              })()}
             </div>
           </div>
         </div>
