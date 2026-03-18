@@ -536,12 +536,21 @@ export default function LandingPage({ onStart, onResume, apiBase, apiOk, misconf
   const [activeTab, setActiveTab]     = useState("talk");
   const [showLogin, setShowLogin]     = useState(false);
   const [showIntro, setShowIntro]     = useState(false);
-  const [historyList]                 = useState(() => {
+  const [historyList, setHistoryList] = useState(() => {
     try {
       const all = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
       return Object.values(all).sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
     } catch { return []; }
   });
+
+  const deleteHistoryItem = (sessionId) => {
+    try {
+      const all = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+      delete all[sessionId];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+    } catch (e) { console.warn(e); }
+    setHistoryList(prev => prev.filter(s => s.sessionId !== sessionId));
+  };
   // Force light theme and remove toggle logic
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", "light");
@@ -786,24 +795,38 @@ export default function LandingPage({ onStart, onResume, apiBase, apiOk, misconf
               {historyList.slice(0, 4).map(session => {
                 const meta = PERSONAS.find(p => p.id === session.personaId) || PERSONAS[0];
                 return (
-                  <button
+                  <div
                     key={session.sessionId}
                     className="home-history-card"
                     style={{ "--h-color": meta.color }}
-                    onClick={() => onResume(session)}
                   >
-                    <div className="hhc-left">
-                      <div className="hhc-dot" />
-                      <div className="hhc-info">
-                        <span className="hhc-name">{meta.label}</span>
-                        <span className="hhc-preview">{session.preview}</span>
+                    <button className="hhc-body" onClick={() => onResume(session)}>
+                      <div className="hhc-left">
+                        <div className="hhc-dot" />
+                        <div className="hhc-info">
+                          <span className="hhc-name">{meta.label}</span>
+                          <span className="hhc-preview">{session.preview}</span>
+                        </div>
                       </div>
-                    </div>
-                    <div className="hhc-right">
-                      <span className="hhc-time">{fmtSessionDate(session.savedAt)}</span>
-                      <span className="hhc-count">{session.messages.length} msgs</span>
-                    </div>
-                  </button>
+                      <div className="hhc-right">
+                        <span className="hhc-time">{fmtSessionDate(session.savedAt)}</span>
+                        <span className="hhc-count">{session.messages.length} msgs</span>
+                      </div>
+                    </button>
+                    <button
+                      className="hhc-delete"
+                      onClick={() => deleteHistoryItem(session.sessionId)}
+                      title="Delete"
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                        <path d="M10 11v6M14 11v6"/>
+                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                      </svg>
+                    </button>
+                  </div>
                 );
               })}
             </div>
