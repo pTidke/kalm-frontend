@@ -108,7 +108,35 @@ const Icons = {
   ),
 };
 
-// Trailer door icon
+// ── Typewriter component ─────────────────────────────────────────
+function TypedText({ text, onDone }) {
+  const [displayed, setDisplayed] = useState("");
+  const idx = useRef(0);
+
+  useEffect(() => {
+    idx.current = 0;
+    setDisplayed("");
+    // Finish in ~2–3s regardless of length
+    const speed = Math.max(4, Math.min(25, 2400 / text.length));
+    const timer = setInterval(() => {
+      idx.current += 1;
+      setDisplayed(text.slice(0, idx.current));
+      if (idx.current >= text.length) {
+        clearInterval(timer);
+        onDone?.();
+      }
+    }, speed);
+    return () => clearInterval(timer);
+  }, [text]);
+
+  return (
+    <>
+      {displayed}
+      <span className="typing-cursor" />
+    </>
+  );
+}
+
 // ── Storage helpers ─────────────────────────────────────────────
 const STORAGE_KEY = "mytrailer_chat_sessions";
 
@@ -256,6 +284,7 @@ export default function ChatPage({ sessionData, onBack, apiBase }) {
         id: Date.now() + 1,
         role: "assistant",
         content: data.reply,
+        typing: true,
         time: new Date(),
       }]);
       setAlgeeStage(data.algee_stage_name || "approach");
@@ -500,7 +529,18 @@ export default function ChatPage({ sessionData, onBack, apiBase }) {
                   msg.role === "user" ? "user-bubble" : "bot-bubble"
                 } ${msg.error ? "error-bubble" : ""}`}
               >
-                <p className="bubble-text">{msg.content}</p>
+                <p className="bubble-text">
+                  {msg.typing ? (
+                    <TypedText
+                      text={msg.content}
+                      onDone={() =>
+                        setMessages(prev =>
+                          prev.map(m => m.id === msg.id ? { ...m, typing: false } : m)
+                        )
+                      }
+                    />
+                  ) : msg.content}
+                </p>
                 {msg.error && lastFailedText && (
                   <button
                     className="retry-btn"
