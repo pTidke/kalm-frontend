@@ -7,10 +7,10 @@ const API_HEADERS = {
 };
 
 const PERSONA_META = {
-  mate:      { label: "Buddy",     mode: "Buddy",     accent: "#B85C2A", bg: "rgba(184,92,42,0.12)",  border: "rgba(184,92,42,0.25)",  bubble: "#B85C2A" },
-  counselor: { label: "Counselor", mode: "Counselor", accent: "#1E7A6E", bg: "rgba(30,122,110,0.12)",  border: "rgba(30,122,110,0.25)",  bubble: "#1E7A6E" },
-  mindful:   { label: "Mindful",   mode: "Mindful",   accent: "#2B4C7E", bg: "rgba(43,76,126,0.12)",  border: "rgba(43,76,126,0.25)",  bubble: "#2B4C7E" },
-  info:      { label: "Informer",  mode: "Informer",  accent: "#5B4FA8", bg: "rgba(91,79,168,0.12)",  border: "rgba(91,79,168,0.25)",  bubble: "#5B4FA8" },
+  mack: { label: "Mack", mode: "Ironworker",   accent: "#4A6FA5", bg: "rgba(74,111,165,0.12)",  border: "rgba(74,111,165,0.25)",  bubble: "#4A6FA5" },
+  ray:  { label: "Ray",  mode: "Pipefitter",   accent: "#C0531A", bg: "rgba(192,83,26,0.12)",   border: "rgba(192,83,26,0.25)",   bubble: "#C0531A" },
+  deb:  { label: "Deb",  mode: "Safety Lead",  accent: "#2E8B80", bg: "rgba(46,139,128,0.12)",  border: "rgba(46,139,128,0.25)",  bubble: "#2E8B80" },
+  lou:  { label: "Lou",  mode: "Carpenter",    accent: "#8B5A2B", bg: "rgba(139,90,43,0.12)",   border: "rgba(139,90,43,0.25)",   bubble: "#8B5A2B" },
 };
 
 const STAGE_LABELS = {
@@ -21,13 +21,36 @@ const STAGE_LABELS = {
   encourage_self:         "Guiding",
 };
 
-const STARTERS = [
-  "Rough day on site",
-  "Can't switch off after work",
-  "Something happened today I can't shake",
-  "Worried about a coworker",
-  "Been drinking more than I should",
-];
+const STARTERS = {
+  mack: [
+    "Long shift today",
+    "Something's been sitting with me",
+    "Can't really explain it, just off",
+    "Rough one with the foreman",
+    "Just need somewhere to put it",
+  ],
+  ray: [
+    "Rough day, need to vent",
+    "Something happened on site",
+    "Been drinking more than I should",
+    "Fed up with work lately",
+    "Something I can't say to anyone else",
+  ],
+  deb: [
+    "Something's been weighing on me",
+    "Worried about someone on my crew",
+    "Hard to talk about this with anyone",
+    "Not sleeping well lately",
+    "A lot going on at home",
+  ],
+  lou: [
+    "Feels like nobody would get it",
+    "Things at home are falling apart",
+    "Drinking more than I should",
+    "Not sure where to even start",
+    "Been here before and I don't want to be back",
+  ],
+};
 
 const PLACEHOLDERS = ["Say something.", "Long shift?", "Rough day?", "Need a minute?"];
 
@@ -86,25 +109,6 @@ const Icons = {
 };
 
 // Trailer door icon
-const TrailerIcon = ({ size = 18 }) => (
-  <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
-    <rect x="2" y="8" width="28" height="18" rx="1.5"
-      stroke="currentColor" strokeWidth="1.6" fill="none"/>
-    <circle cx="8" cy="26" r="2.2"
-      stroke="currentColor" strokeWidth="1.4" fill="none"/>
-    <circle cx="24" cy="26" r="2.2"
-      stroke="currentColor" strokeWidth="1.4" fill="none"/>
-    <rect x="12" y="12" width="8" height="11" rx="0.5"
-      stroke="currentColor" strokeWidth="1.4" fill="none"/>
-    <line x1="19.5" y1="12.5" x2="19.5" y2="22.5"
-      stroke="currentColor" strokeWidth="2"
-      strokeLinecap="round" opacity="0.5"/>
-    <circle cx="13.5" cy="17.5" r="0.8" fill="currentColor"/>
-    <line x1="2" y1="17" x2="0" y2="17"
-      stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
-  </svg>
-);
-
 // ── Storage helpers ─────────────────────────────────────────────
 const STORAGE_KEY = "mytrailer_chat_sessions";
 
@@ -150,26 +154,32 @@ function formatDate(iso) {
 
 // ── Component ───────────────────────────────────────────────────
 export default function ChatPage({ sessionData, onBack, apiBase }) {
-  const [messages, setMessages] = useState([{
-    id: 1,
-    role: "assistant",
-    content: sessionData.greeting,
-    time: new Date(),
-  }]);
+  const isOffline  = !!sessionData.error;
+  const isResumed  = !!sessionData.resumedMessages;
+  const offlineMsg = sessionData.error === "misconfigured"
+    ? "MyTrailer isn't configured correctly. The API URL is missing — check your environment settings."
+    : "Service is unavailable right now. The server couldn't be reached. Try again in a moment, or check your connection.";
+
+  const [messages, setMessages] = useState(() => {
+    if (isResumed)
+      return sessionData.resumedMessages.map(m => ({ ...m, time: new Date(m.time) }));
+    return [{ id: 1, role: "assistant", content: isOffline ? offlineMsg : sessionData.greeting, time: new Date() }];
+  });
   const [input, setInput]               = useState("");
   const [loading, setLoading]           = useState(false);
   const [algeeStage, setAlgeeStage]     = useState("approach");
   const [safetyLevel, setSafetyLevel]   = useState(0);
   const [showCrisis, setShowCrisis]     = useState(false);
-  const [showStarters, setShowStarters] = useState(true);
+  const [showStarters, setShowStarters] = useState(!isOffline && !isResumed);
   const [showInfo, setShowInfo]         = useState(false);
   const [showHistory, setShowHistory]   = useState(false);
   const [pastSessions, setPastSessions] = useState({});
   const [placeholderIdx, setPlaceholderIdx] = useState(0);
+  const [lastFailedText, setLastFailedText] = useState(null);
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
-  const p = PERSONA_META[sessionData.personaId] || PERSONA_META.counselor;
+  const p = PERSONA_META[sessionData.personaId] || PERSONA_META.mack;
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -252,10 +262,11 @@ export default function ChatPage({ sessionData, onBack, apiBase }) {
       setSafetyLevel(data.safety_level || 0);
       if (data.crisis_resources) setShowCrisis(true);
     } catch {
+      setLastFailedText(trimmed);
       setMessages(prev => [...prev, {
         id: Date.now() + 1,
         role: "assistant",
-        content: "Lost connection. Try again.",
+        content: "Lost connection.",
         time: new Date(),
         error: true,
       }]);
@@ -301,10 +312,10 @@ export default function ChatPage({ sessionData, onBack, apiBase }) {
 
         <div className="header-identity">
           <div className="header-icon">
-            <TrailerIcon size={18} />
+            {p.label.slice(0, 2).toUpperCase()}
           </div>
           <div>
-            <div className="header-name">MyTrailer</div>
+            <div className="header-name">{p.label}</div>
             <div className="header-sub">{p.mode}</div>
           </div>
         </div>
@@ -388,7 +399,7 @@ export default function ChatPage({ sessionData, onBack, apiBase }) {
                   .map(session => {
                     const meta =
                       PERSONA_META[session.personaId] ||
-                      PERSONA_META.counselor;
+                      PERSONA_META.mack;
                     return (
                       <button
                         key={session.sessionId}
@@ -481,7 +492,7 @@ export default function ChatPage({ sessionData, onBack, apiBase }) {
             >
               {msg.role === "assistant" && (
                 <div className="bot-avatar">
-                  <TrailerIcon size={16} />
+                  {p.label.slice(0, 2).toUpperCase()}
                 </div>
               )}
               <div
@@ -490,6 +501,14 @@ export default function ChatPage({ sessionData, onBack, apiBase }) {
                 } ${msg.error ? "error-bubble" : ""}`}
               >
                 <p className="bubble-text">{msg.content}</p>
+                {msg.error && lastFailedText && (
+                  <button
+                    className="retry-btn"
+                    onClick={() => { setLastFailedText(null); send(lastFailedText); }}
+                  >
+                    Retry →
+                  </button>
+                )}
                 <span className="bubble-time">{fmtTime(msg.time)}</span>
               </div>
             </div>
@@ -498,7 +517,7 @@ export default function ChatPage({ sessionData, onBack, apiBase }) {
           {loading && (
             <div className="message-row bot-row">
               <div className="bot-avatar">
-                <TrailerIcon size={16} />
+                {p.label.slice(0, 2).toUpperCase()}
               </div>
               <div className="bubble bot-bubble typing-bubble">
                 <span /><span /><span />
@@ -515,7 +534,7 @@ export default function ChatPage({ sessionData, onBack, apiBase }) {
         <div className="starters">
           <div className="starters-label">Not sure where to start?</div>
           <div className="starters-list">
-            {STARTERS.map((s, i) => (
+            {(STARTERS[sessionData.personaId] || STARTERS.mack).map((s, i) => (
               <button
                 key={i}
                 className="starter-btn"
@@ -530,27 +549,39 @@ export default function ChatPage({ sessionData, onBack, apiBase }) {
 
       {/* ── Input area ─────────────────────────────────────── */}
       <div className="input-area">
-        <div className="input-wrapper">
-          <textarea
-            ref={inputRef}
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={handleKey}
-            onInput={resizeTextarea}
-            placeholder={PLACEHOLDERS[placeholderIdx]}
-            rows={1}
-            className="chat-input"
-          />
-          <button
-            className={`send-btn ${
-              input.trim() && !loading ? "ready" : ""
-            }`}
-            onClick={() => send(input)}
-            disabled={!input.trim() || loading}
-          >
-            {Icons.send}
-          </button>
-        </div>
+        {isOffline ? (
+          <div className="offline-bar">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            Service unavailable — <button className="offline-back-btn" onClick={onBack}>go back</button> and try again
+          </div>
+        ) : (
+          <div className="input-wrapper">
+            <textarea
+              ref={inputRef}
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={handleKey}
+              onInput={resizeTextarea}
+              placeholder={PLACEHOLDERS[placeholderIdx]}
+              rows={1}
+              className="chat-input"
+            />
+            <button
+              className={`send-btn ${
+                input.trim() && !loading ? "ready" : ""
+              }`}
+              onClick={() => send(input)}
+              disabled={!input.trim() || loading}
+            >
+              {Icons.send}
+            </button>
+          </div>
+        )}
         <div className="input-footer">
           <span>Private · Stays on your device</span>
           <span className="input-footer-dot">·</span>

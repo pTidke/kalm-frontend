@@ -13,7 +13,6 @@ const apiBase = import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "";
 export default function App() {
   const [page, setPage]               = useState("landing");
   const [sessionData, setSessionData] = useState(null);
-  const [waking, setWaking]           = useState(false);
   const [apiOk, setApiOk]             = useState(null);
   const [misconfig, setMisconfig]     = useState(false);
   const [showEntrance, setShowEntrance] = useState(
@@ -38,22 +37,9 @@ export default function App() {
 
   const handleStart = async (personaId) => {
     if (!apiBase) {
-      alert("VITE_API_URL is not configured.");
+      setSessionData({ error: "misconfigured", personaId, apiBase });
+      setPage("chat");
       return;
-    }
-    if (!apiOk) {
-      setWaking(true);
-      for (let i = 0; i < 7; i++) {
-        try {
-          const res = await fetch(`${apiBase}/ping`, {
-            headers: API_HEADERS,
-            signal: AbortSignal.timeout(6000),
-          });
-          if (res.ok) { setApiOk(true); break; }
-        } catch {}
-        await new Promise(r => setTimeout(r, 5000));
-      }
-      setWaking(false);
     }
     try {
       const res = await fetch(`${apiBase}/session/new`, {
@@ -65,8 +51,19 @@ export default function App() {
       setSessionData({ ...data, personaId, apiBase });
       setPage("chat");
     } catch {
-      alert("Could not connect to MyTrailer. Please try again in a moment.");
+      setSessionData({ error: "service_unavailable", personaId, apiBase });
+      setPage("chat");
     }
+  };
+
+  const handleResume = (session) => {
+    setSessionData({
+      session_id: session.sessionId,
+      personaId:  session.personaId,
+      apiBase,
+      resumedMessages: session.messages,
+    });
+    setPage("chat");
   };
 
   const handleBack = () => {
@@ -74,42 +71,6 @@ export default function App() {
     setSessionData(null);
     pingServer();
   };
-
-  if (waking) {
-    return (
-      <div style={{
-        height: "100dvh", display: "flex", flexDirection: "column",
-        alignItems: "center", justifyContent: "center",
-        background: "var(--bg-deep)", fontFamily: "'Inter', sans-serif",
-        gap: 16, padding: 24,
-      }}>
-        <div style={{ display: "flex", gap: 8, marginBottom: 4 }}>
-          {[0,1,2].map(i => (
-            <div key={i} style={{
-              width: 10, height: 10, borderRadius: "50%",
-              background: "var(--orange)",
-              animation: "bounce 1.2s ease-in-out infinite",
-              animationDelay: `${i * 0.2}s`,
-            }}/>
-          ))}
-        </div>
-        <p style={{ fontSize: 15, color: "var(--text-primary)", fontWeight: 600 }}>
-          Starting up MyTrailer...
-        </p>
-        <p style={{ fontSize: 13, color: "var(--text-secondary)", textAlign: "center",
-          maxWidth: 280, lineHeight: 1.6 }}>
-          The server is waking up after a period of inactivity.
-          This takes about 30 seconds — just the once.
-        </p>
-        <style>{`
-          @keyframes bounce {
-            0%,60%,100%{transform:translateY(0);opacity:0.4}
-            30%{transform:translateY(-8px);opacity:1}
-          }
-        `}</style>
-      </div>
-    );
-  }
 
   const handleEntranceComplete = () => {
     setShowEntrance(false);
@@ -122,6 +83,7 @@ export default function App() {
       {page === "landing" ? (
         <LandingPage
           onStart={handleStart}
+          onResume={handleResume}
           apiBase={apiBase}
           apiOk={apiOk}
           misconfig={misconfig}

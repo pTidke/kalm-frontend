@@ -3,35 +3,97 @@ import "./landing.css";
 
 const PERSONAS = [
   {
-    id: "mate",
-    label: "Buddy",
-    tagline: "No BS, straight talk",
-    desc: "Talks like a coworker. Plain language, no therapy-speak.",
-    color: "#B85C2A",
+    id: "mack",
+    label: "Mack",
+    tagline: "Ironworker · Ohio · 18 yrs",
+    shortDesc: "Doesn't say much. But he's listening.",
+    color: "#4A6FA5",
+    bio: "Grew up in Youngstown. Dad was a steelworker before the mills closed. Mack never left — just moved from steel to iron. Divorced seven years ago. Has a teenage son he sees on weekends. Doesn't talk about it much, but you can tell it shaped him.",
+    stats: [
+      { key: "Age",      val: "42" },
+      { key: "Trade",    val: "Ironworker — structural steel, bridges, high-rises" },
+      { key: "Home",     val: "Columbus, Ohio. Rents a house. Doesn't need much." },
+      { key: "Family",   val: "Divorced. Son named Tyler, 16. Every other weekend." },
+      { key: "Off-site", val: "Works on an old F-150 in the driveway. Doesn't watch much TV." },
+    ],
+    howTheyTalk: [
+      "Short sentences. Waits for you to finish.",
+      "Never gives advice unless you ask for it.",
+      "Doesn't fake enthusiasm. Means what he says.",
+      'If he says "yeah" — he actually heard you.',
+    ],
+    signature: "I'm not going anywhere. Take your time.",
+    intro: "won't push. He won't offer advice until he's sure you're done talking. But he's not going anywhere. Short sentences. Real listening. When he finally says something — it lands.",
   },
-  /*
   {
-    id: "counselor",
-    label: "Counselor",
-    tagline: "Steady and direct",
-    desc: "Calm, focused. Helps you work through it without the fluff.",
-    color: "#1E7A6E",
+    id: "ray",
+    label: "Ray",
+    tagline: "Pipefitter · Texas · 14 yrs",
+    shortDesc: "No filter, no judgment. Says it straight.",
+    color: "#C0531A",
+    bio: "Grew up outside San Antonio. Third generation in the trades — grandfather was a plumber, dad was a welder. Ray went pipefitting because the money was better. Never married, but close. Has a younger sister he looks out for. Says what he thinks and has the bar tab stories to prove it.",
+    stats: [
+      { key: "Age",      val: "38" },
+      { key: "Trade",    val: "Pipefitter — refineries, industrial plants, chemical facilities" },
+      { key: "Home",     val: "Odessa, Texas. Owns a small house. Has a dog named Chief." },
+      { key: "Family",   val: "Single. Close with his sister and her two kids." },
+      { key: "Off-site", val: "Fantasy football. Friday night poker. Volunteers at the local VFW sometimes." },
+    ],
+    howTheyTalk: [
+      "Says what everyone else is thinking.",
+      "No filter — but not cruel about it.",
+      'Uses "look" and "man" and "here\'s the thing."',
+      "Dry humor when the moment calls for it.",
+    ],
+    signature: "Look, I'm gonna say it straight — and I mean it.",
+    intro: "doesn't sugarcoat. He'll tell you what he thinks — but only after he hears you out. Third generation in the trades. He's seen the pressure from every angle. He gets it.",
   },
   {
-    id: "mindful",
-    label: "Mindful",
-    tagline: "Quiet, no pressure",
-    desc: "Slows things down. Good when your head won't stop.",
-    color: "#2B4C7E",
+    id: "deb",
+    label: "Deb",
+    tagline: "Safety Lead · Michigan · 20 yrs",
+    shortDesc: "Seen everything. Zero drama. Easy to talk to.",
+    color: "#2E8B80",
+    bio: "Started on sites as a laborer out of Detroit — one of the only women on the crew. Worked her way to safety lead the hard way. Seen two fatalities in twenty years. It changed how she sees everything. She doesn't panic, doesn't dramatize — she just handles it.",
+    stats: [
+      { key: "Age",      val: "46" },
+      { key: "Trade",    val: "Safety Lead — commercial construction, heavy civil" },
+      { key: "Home",     val: "Grand Rapids, Michigan. Has a house she's been renovating herself for six years." },
+      { key: "Family",   val: "Married 18 years. Two kids, both in college now." },
+      { key: "Off-site", val: "Runs half-marathons. Terrible at watching sports but goes anyway." },
+    ],
+    howTheyTalk: [
+      "Steady and warm — never rushed.",
+      "Doesn't minimize what you're carrying.",
+      "Makes you feel like you're the only conversation happening.",
+      "Zero drama. Just presence.",
+    ],
+    signature: "Whatever you're carrying — it's okay to put it down here.",
+    intro: "has had a thousand hard conversations on site. Nothing you say will rattle her. She doesn't dramatize, doesn't minimize. She just shows up — steady, warm, and completely present.",
   },
   {
-    id: "info",
-    label: "Informer",
-    tagline: "Just the facts",
-    desc: "Clear, simple explanations of what's happening and why.",
-    color: "#5B4FA8",
+    id: "lou",
+    label: "Lou",
+    tagline: "Carpenter · Pennsylvania · 22 yrs",
+    shortDesc: "Been through it himself. Still here.",
+    color: "#8B5A2B",
+    bio: "Been in the trade since he was 19. Worked his way from apprentice to foreman on big commercial jobs in Pittsburgh. Around year 12, his marriage fell apart and he spent 18 months drinking too much and not talking to anyone. One guy on his crew noticed and asked him straight. That conversation changed things. He hasn't forgotten it.",
+    stats: [
+      { key: "Age",      val: "44" },
+      { key: "Trade",    val: "Carpenter / Foreman — commercial and residential, framing to finish" },
+      { key: "Home",     val: "Pittsburgh, Pennsylvania. Same neighborhood he grew up in." },
+      { key: "Family",   val: "Divorced. Two daughters, 14 and 17. Sees them most weekends." },
+      { key: "Off-site", val: "Coaches youth baseball in summer. Makes furniture in his garage." },
+    ],
+    howTheyTalk: [
+      "Takes his time. Never rushes you.",
+      "Will share a bit of himself when it actually helps.",
+      "Doesn't pretend things are fine when they're not.",
+      "Patient in a way that feels earned, not performed.",
+    ],
+    signature: "I've been exactly where you are. And I'm still here.",
+    intro: "has been exactly where you are. The silence, the too many drinks, the eighteen months of not talking to anyone. He came out the other side. He wants you to as well.",
   },
-  */
 ];
 
 const TABS = [
@@ -76,34 +138,37 @@ const TABS = [
 ];
 
 const PersonaIcons = {
-  mate: (
+  mack: (
+    // I-beam — structural steel / ironworker
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M2 18h20"/>
-      <path d="M20 18v-2a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v2"/>
-      <path d="M12 14V4c0-1.1.9-2 2-2h4a1 1 0 0 1 1 1v1"/>
-      <path d="M4 16c0-4.4 3.6-8 8-8s8 3.6 8 8"/>
-      <path d="M12 8V4"/>
-    </svg>
-  ),
-  counselor: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
       stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      <line x1="4"  y1="4"  x2="20" y2="4"/>
+      <line x1="12" y1="4"  x2="12" y2="20"/>
+      <line x1="4"  y1="20" x2="20" y2="20"/>
     </svg>
   ),
-  mindful: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+  ray: (
+    // Wrench — pipefitter
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+    </svg>
+  ),
+  deb: (
+    // Shield with check — safety lead
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
       stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      <polyline points="9 12 11 14 15 10"/>
     </svg>
   ),
-  info: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+  lou: (
+    // Hammer — carpenter
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
       stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10"/>
-      <line x1="12" y1="16" x2="12" y2="12"/>
-      <line x1="12" y1="8" x2="12.01" y2="8"/>
+      <path d="m15 12-8.5 8.5a2.12 2.12 0 0 1-3-3L12 9"/>
+      <path d="M17 11 12 6"/>
+      <path d="M18 6a3 3 0 0 0-3-3l-3 3 3 3 3-3z"/>
     </svg>
   ),
 };
@@ -399,13 +464,84 @@ function BottomBar({ activeTab, onTabChange }) {
   );
 }
 
+/* ── Persona Intro Modal (fullscreen pre-chat) ────────────── */
+function PersonaIntroModal({ persona, onBack, onStart, loading }) {
+  const initials = persona.label.slice(0, 2).toUpperCase();
+
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === "Escape") onBack(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onBack]);
+
+  return (
+    <div className="intro-modal" style={{ "--p-color": persona.color }}>
+      {/* Back */}
+      <button className="intro-back" onClick={onBack}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"/>
+          <polyline points="12 19 5 12 12 5"/>
+        </svg>
+        Back
+      </button>
+
+      <div className="intro-content">
+        <div className="intro-eyebrow">YOUR TRAILER · YOUR CHOICE</div>
+
+        <div className="intro-avatar">{initials}</div>
+
+        <h1 className="intro-name">{persona.label.toUpperCase()}</h1>
+        <div className="intro-tagline">{persona.tagline.toUpperCase()}</div>
+
+        <p className="intro-text">
+          <strong>{persona.label}</strong> {persona.intro}
+        </p>
+
+        <button
+          className="intro-cta"
+          onClick={onStart}
+          disabled={loading}
+        >
+          {loading ? (
+            <span className="btn-loading"><span/><span/><span/></span>
+          ) : (
+            `HEY ${persona.label.toUpperCase()}, GOT A MINUTE? →`
+          )}
+        </button>
+
+        <p className="intro-privacy">
+          Nothing leaves this device · No records · No judgment
+        </p>
+      </div>
+    </div>
+  );
+}
+
+const STORAGE_KEY = "mytrailer_chat_sessions";
+
+function fmtSessionDate(iso) {
+  const d = new Date(iso), now = new Date(), diff = now - d;
+  if (diff < 86400000)  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  if (diff < 604800000) return d.toLocaleDateString([], { weekday: "short" });
+  return d.toLocaleDateString([], { month: "short", day: "numeric" });
+}
+
 /* ── Main Component ───────────────────────────────────────── */
-export default function LandingPage({ onStart, apiBase, apiOk, misconfig }) {
-  const [selected, setSelected] = useState("mate");
-  const [loading, setLoading]   = useState(false);
-  const [visible, setVisible]   = useState(false);
-  const [activeTab, setActiveTab] = useState("talk");
-  const [showLogin, setShowLogin] = useState(false);
+export default function LandingPage({ onStart, onResume, apiBase, apiOk, misconfig }) {
+  const [selected, setSelected]       = useState("mack");
+  const [expanded, setExpanded]       = useState("mack");
+  const [loading, setLoading]         = useState(false);
+  const [visible, setVisible]         = useState(false);
+  const [activeTab, setActiveTab]     = useState("talk");
+  const [showLogin, setShowLogin]     = useState(false);
+  const [showIntro, setShowIntro]     = useState(false);
+  const [historyList]                 = useState(() => {
+    try {
+      const all = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+      return Object.values(all).sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
+    } catch { return []; }
+  });
   // Force light theme and remove toggle logic
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", "light");
@@ -423,6 +559,21 @@ export default function LandingPage({ onStart, apiBase, apiOk, misconfig }) {
     setLoading(true);
     await onStart(selected);
     setLoading(false);
+  };
+
+  const handlePersonaClick = (id) => {
+    const newExpanded = expanded === id ? null : id;
+    setSelected(id);
+    setExpanded(newExpanded);
+    if (newExpanded) {
+      setTimeout(() => {
+        const item = document.querySelector(`[data-persona="${id}"]`);
+        if (!item) return;
+        const rect    = item.getBoundingClientRect();
+        const headerH = 56;   // --nav-h
+        window.scrollBy({ top: rect.top - headerH - 8, behavior: "smooth" });
+      }, 380);
+    }
   };
 
   const persona = PERSONAS.find((p) => p.id === selected);
@@ -525,41 +676,83 @@ export default function LandingPage({ onStart, apiBase, apiOk, misconfig }) {
 
           <div className="hero-eyebrow">A quiet space for you</div>
           <h1 className="hero-title">
-            Your space <br/>
-            <em>on site.</em>
+            NOTHING LEAVES <br/>
+            <em>THIS TRAILER.</em>
           </h1>
           <div className="hero-tagline">BUILT FOR THE ONES WHO BUILD.</div>
           <p className="hero-sub">
-            In the middle of the noise, pressure, and long shifts, it’s your trailer — a place to talk freely, reset your mind, get real support, and walk back stronger. No judgment. No labels. Just a quiet space that’s yours.
+            Whatever happened out there - the pressure, the foreman, the long shift, the thing you can't say to anyone - it stays in here. No records. No judgment. Just a quiet space that's yours.
           </p>
         </main>
 
         {/* Persona selector */}
         <section className="persona-section">
-          <div className="section-label">How do you want to talk?</div>
-          <div className="persona-grid">
+          <div className="section-label">Who do you want in your Trailer today?</div>
+          <div className="persona-accordion">
             {PERSONAS.map((p) => (
-              <button
+              <div
                 key={p.id}
-                className={`persona-card ${selected === p.id ? "active" : ""}`}
+                className={`persona-item ${selected === p.id ? "selected" : ""} ${expanded === p.id ? "open" : ""}`}
                 style={{ "--p-color": p.color }}
-                onClick={() => setSelected(p.id)}
+                data-persona={p.id}
               >
-                <div className="persona-icon">{PersonaIcons[p.id]}</div>
-                <div className="persona-content">
-                  <div className="persona-label">{p.label}</div>
-                  <div className="persona-tagline">{p.tagline}</div>
-                  <div className="persona-desc">{p.desc}</div>
-                </div>
-                {selected === p.id && (
-                  <div className="persona-check">
-                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                      <path d="M2 5l2.5 2.5L8 3" stroke="white"
-                        strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                {/* Header row */}
+                <button className="persona-item-header" onClick={() => handlePersonaClick(p.id)}>
+                  <div className="persona-item-left">
+                    <div className="persona-item-icon">{PersonaIcons[p.id]}</div>
+                    <div className="persona-item-text">
+                      <div className="persona-item-name">{p.label}</div>
+                      <div className="persona-item-meta">{p.tagline}</div>
+                      <div className="persona-item-desc">{p.shortDesc}</div>
+                    </div>
+                  </div>
+                  <div className="persona-item-right">
+                    {selected === p.id && (
+                      <span className="persona-selected-tag">Selected</span>
+                    )}
+                    <svg
+                      className={`persona-chevron ${expanded === p.id ? "open" : ""}`}
+                      width="16" height="16" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" strokeWidth="2.5"
+                      strokeLinecap="round" strokeLinejoin="round"
+                    >
+                      <polyline points="6 9 12 15 18 9"/>
                     </svg>
                   </div>
-                )}
-              </button>
+                </button>
+
+                {/* Expandable bio */}
+                <div className={`persona-item-body ${expanded === p.id ? "open" : ""}`}>
+                  <div className="persona-item-body-inner">
+                    <div className="persona-item-body-content">
+                      <p className="persona-bio-text">{p.bio}</p>
+                      <div className="persona-stats-grid">
+                        {p.stats.map((s) => (
+                          <div key={s.key} className="persona-stat-row">
+                            <span className="persona-stat-key">{s.key}</span>
+                            <span className="persona-stat-val">{s.val}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="persona-talk-section">
+                        <div className="persona-section-sublabel">How they talk</div>
+                        <ul className="persona-talk-list">
+                          {p.howTheyTalk.map((line, i) => (
+                            <li key={i}>{line}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div className="persona-sig">"{p.signature}"</div>
+                      <button
+                        className="persona-talk-cta"
+                        onClick={() => { setSelected(p.id); setShowIntro(true); }}
+                      >
+                        Talk to {p.label} →
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         </section>
@@ -568,24 +761,54 @@ export default function LandingPage({ onStart, apiBase, apiOk, misconfig }) {
         <section className="cta-section">
           <button
             className="start-btn"
-            onClick={handleStart}
-            disabled={loading || apiOk === false}
+            style={{ "--p-color": persona?.color }}
+            onClick={() => setShowIntro(true)}
           >
-            {loading ? (
-              <span className="btn-loading"><span/><span/><span/></span>
-            ) : (
-              <>
-                Step Inside
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
-                  className="btn-arrow">
-                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor"
-                    strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </>
-            )}
+            <>
+              Invite {persona?.label} in
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                className="btn-arrow">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor"
+                  strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </>
           </button>
           <p className="cta-note">Private · Confined to this device</p>
         </section>
+
+        {/* Chat history */}
+        {historyList.length > 0 && (
+          <section className="home-history-section">
+            <div className="section-label" style={{ marginTop: 0 }}>
+              Pick up where you left off
+            </div>
+            <div className="home-history-list">
+              {historyList.slice(0, 4).map(session => {
+                const meta = PERSONAS.find(p => p.id === session.personaId) || PERSONAS[0];
+                return (
+                  <button
+                    key={session.sessionId}
+                    className="home-history-card"
+                    style={{ "--h-color": meta.color }}
+                    onClick={() => onResume(session)}
+                  >
+                    <div className="hhc-left">
+                      <div className="hhc-dot" />
+                      <div className="hhc-info">
+                        <span className="hhc-name">{meta.label}</span>
+                        <span className="hhc-preview">{session.preview}</span>
+                      </div>
+                    </div>
+                    <div className="hhc-right">
+                      <span className="hhc-time">{fmtSessionDate(session.savedAt)}</span>
+                      <span className="hhc-count">{session.messages.length} msgs</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {/* Crisis bar */}
         <div className="crisis-bar">
@@ -606,6 +829,14 @@ export default function LandingPage({ onStart, apiBase, apiOk, misconfig }) {
         {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
       </div>
       <BottomBar activeTab={activeTab} onTabChange={setActiveTab} />
+      {showIntro && persona && (
+        <PersonaIntroModal
+          persona={persona}
+          onBack={() => setShowIntro(false)}
+          onStart={handleStart}
+          loading={loading}
+        />
+      )}
     </>
   );
 }
