@@ -376,6 +376,34 @@ body {
 :root[data-theme="light"] .theme-toggle:hover {
   background: rgba(212, 92, 6, 0.12);
 }
+/* ── Landing footer (legal links) ────────────────────── */
+.landing-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px 16px 100px;
+}
+.landing-footer a {
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  opacity: 0.35;
+  text-decoration: none;
+  font-family: "Montserrat", sans-serif;
+  transition: opacity 0.2s;
+}
+.landing-footer a:hover {
+  opacity: 0.6;
+  text-decoration: underline;
+}
+.landing-footer-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  opacity: 0.2;
+}
+
 /* ── Mobile bottom Nav Bar ────────────────────────────── */
 .bottom-nav {
   display: none; /* Desktop hidden */

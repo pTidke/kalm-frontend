@@ -168,6 +168,7 @@ export default function App() {
           onSignIn={handleSignIn}
           onSignOut={handleSignOut}
           onProfileClick={() => navigate("profile")}
+          onNavigate={navigate}
         />
       ) : page === "profile" ? (
         <ProfilePage

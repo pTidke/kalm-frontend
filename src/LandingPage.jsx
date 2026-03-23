@@ -545,7 +545,7 @@ function fmtSessionDate(iso) {
 }
 
 /* ── Main Component ───────────────────────────────────────── */
-export default function LandingPage({ onStart, onResume, apiBase, apiOk, misconfig, user, onSignIn, onSignOut, onProfileClick }) {
+export default function LandingPage({ onStart, onResume, apiBase, apiOk, misconfig, user, onSignIn, onSignOut, onProfileClick, onNavigate }) {
   const [selected, setSelected]       = useState("mack");
   const [expanded, setExpanded]       = useState("mack");
   const [loading, setLoading]         = useState(false);
@@ -871,6 +871,12 @@ export default function LandingPage({ onStart, onResume, apiBase, apiOk, misconf
         </div>
 
         {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
+
+        <footer className="landing-footer">
+          <a href="/privacy" onClick={(e) => { e.preventDefault(); onNavigate("privacy"); }}>Privacy Policy</a>
+          <span className="landing-footer-dot" />
+          <a href="/terms" onClick={(e) => { e.preventDefault(); onNavigate("terms"); }}>Terms of Service</a>
+        </footer>
       </div>
       <BottomBar activeTab={activeTab} onTabChange={setActiveTab} />
       {showIntro && persona && (
