@@ -385,7 +385,7 @@ function LoginModal({ onClose }) {
 }
 
 /* ── Top Nav Bar ──────────────────────────────────────────── */
-function TopBar({ activeTab, onTabChange, apiOk, misconfig, onLoginClick }) {
+function TopBar({ activeTab, onTabChange, apiOk, misconfig, user, onSignIn, onProfileClick }) {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -433,13 +433,30 @@ function TopBar({ activeTab, onTabChange, apiOk, misconfig, onLoginClick }) {
               Live
             </div>
           )}
-          <button className="login-btn" onClick={onLoginClick}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
-            </svg>
-            <span className="login-btn-label">Sign In</span>
-          </button>
+          {user ? (
+            <button className="user-menu-btn" onClick={onProfileClick} title="Profile">
+              {user.user_metadata?.avatar_url ? (
+                <img
+                  src={user.user_metadata.avatar_url}
+                  alt=""
+                  className="user-avatar"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <span className="user-avatar-fallback">
+                  {(user.user_metadata?.full_name || user.email || "U").charAt(0).toUpperCase()}
+                </span>
+              )}
+            </button>
+          ) : (
+            <button className="login-btn" onClick={onSignIn}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              <span className="login-btn-label">Sign In</span>
+            </button>
+          )}
         </div>
       </div>
     </header>
@@ -528,7 +545,7 @@ function fmtSessionDate(iso) {
 }
 
 /* ── Main Component ───────────────────────────────────────── */
-export default function LandingPage({ onStart, onResume, apiBase, apiOk, misconfig }) {
+export default function LandingPage({ onStart, onResume, apiBase, apiOk, misconfig, user, onSignIn, onSignOut, onProfileClick }) {
   const [selected, setSelected]       = useState("mack");
   const [expanded, setExpanded]       = useState("mack");
   const [loading, setLoading]         = useState(false);
@@ -597,7 +614,9 @@ export default function LandingPage({ onStart, onResume, apiBase, apiOk, misconf
             onTabChange={setActiveTab}
             apiOk={apiOk}
             misconfig={misconfig}
-            onLoginClick={() => setShowLogin(true)}
+            user={user}
+            onSignIn={onSignIn}
+            onProfileClick={onProfileClick}
           />
           <main className="tab-content">
             <header className="tab-header">
@@ -675,7 +694,9 @@ export default function LandingPage({ onStart, onResume, apiBase, apiOk, misconf
           onTabChange={setActiveTab}
           apiOk={apiOk}
           misconfig={misconfig}
-          onLoginClick={() => setShowLogin(true)}
+          user={user}
+          onSignIn={onSignIn}
+          onProfileClick={onProfileClick}
         />
 
         <main className="hero">
