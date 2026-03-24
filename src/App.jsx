@@ -21,7 +21,6 @@ const apiBase = import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "";
 async function getAuthHeaders() {
   const headers = {
     "Content-Type": "application/json",
-    "ngrok-skip-browser-warning": "true",
   };
   const { data: { session } } = await supabase.auth.getSession();
   if (session?.access_token) {

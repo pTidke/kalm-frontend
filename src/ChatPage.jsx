@@ -4,7 +4,6 @@ import "./chat.css";
 
 const API_HEADERS = {
   "Content-Type": "application/json",
-  "ngrok-skip-browser-warning": "true",
 };
 
 const PERSONA_META = {
