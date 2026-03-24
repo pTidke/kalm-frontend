@@ -1,9 +1,32 @@
 import { supabase } from "./supabase";
 
+const EXPIRE_DAYS = 30;
+
+/* ── Auto-expire sessions older than 30 days ─────────────── */
+async function expireOldSessions() {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - EXPIRE_DAYS);
+
+  const { error } = await supabase
+    .from("chat_sessions")
+    .delete()
+    .lt("updated_at", cutoff.toISOString());
+
+  if (error) console.warn("Expire sessions error:", error.message);
+}
+
+/* ── Check if user has opted in to saving history ────────── */
+export function isSaveHistoryEnabled() {
+  return localStorage.getItem("mytrailer_save_history") !== "false";
+}
+
 /* ── Load all sessions for the current user ──────────────── */
 export async function loadAllSessions() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return {};
+
+  // Clean up expired sessions on each load
+  await expireOldSessions();
 
   const { data, error } = await supabase
     .from("chat_sessions")

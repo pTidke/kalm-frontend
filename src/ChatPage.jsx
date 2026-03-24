@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { loadAllSessions, saveSession, deleteSession, clearAllSessions, formatDate } from "./storage";
+import { loadAllSessions, saveSession, deleteSession, clearAllSessions, formatDate, isSaveHistoryEnabled } from "./storage";
 import "./chat.css";
 
 const API_HEADERS = {
@@ -186,9 +186,9 @@ export default function ChatPage({ sessionData, onBack, apiBase, getAuthHeaders 
     return () => clearInterval(t);
   }, []);
 
-  // Save to Supabase whenever messages update
+  // Save to Supabase whenever messages update (if user opted in)
   useEffect(() => {
-    if (messages.length > 1)
+    if (messages.length > 1 && isSaveHistoryEnabled())
       saveSession(sessionData.session_id, sessionData.personaId, messages).catch(() => {});
   }, [messages]);
 
