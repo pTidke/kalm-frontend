@@ -119,3 +119,111 @@ input {
 .entrance-overlay.is-open .entrance-logo {
   opacity: 0;
 }
+
+/* ── Consent Modal ────────────────────────────────────────── */
+.consent-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.consent-modal {
+  background: #1e2a3a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 32px 28px 24px;
+  max-width: 440px;
+  width: 100%;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+}
+
+.consent-title {
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 16px;
+}
+
+.consent-text {
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  opacity: 0.7;
+  line-height: 1.65;
+  margin: 0 0 12px;
+}
+
+.consent-text strong {
+  color: var(--text-primary);
+  opacity: 1;
+}
+
+.consent-text-small {
+  font-size: 0.82rem;
+  opacity: 0.5;
+  margin-top: 16px;
+}
+
+.consent-text a {
+  color: #4A6FA5;
+  text-decoration: none;
+}
+.consent-text a:hover {
+  text-decoration: underline;
+}
+
+.consent-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.consent-cancel {
+  flex: 1;
+  padding: 12px;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: var(--text-primary);
+  opacity: 0.6;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.consent-cancel:hover {
+  opacity: 0.9;
+}
+
+.consent-agree {
+  flex: 2;
+  padding: 12px;
+  background: #4A6FA5;
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.consent-agree:hover {
+  background: #3d5f8f;
+}
+
+/* Light mode */
+:root[data-theme="light"] .consent-modal {
+  background: #fff;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+:root[data-theme="light"] .consent-cancel {
+  border-color: rgba(0, 0, 0, 0.15);
+}

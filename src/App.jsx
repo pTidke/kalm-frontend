@@ -15,12 +15,20 @@ function getInitialPage() {
   return "landing";
 }
 
-const API_HEADERS = {
-  "Content-Type": "application/json",
-  "ngrok-skip-browser-warning": "true",
-};
-
 const apiBase = import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "";
+
+/* ── Authenticated API headers ───────────────────────────── */
+async function getAuthHeaders() {
+  const headers = {
+    "Content-Type": "application/json",
+    "ngrok-skip-browser-warning": "true",
+  };
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session?.access_token) {
+    headers["Authorization"] = `Bearer ${session.access_token}`;
+  }
+  return headers;
+}
 
 export default function App() {
   const [page, setPage]               = useState(getInitialPage);
@@ -32,6 +40,8 @@ export default function App() {
   const [showEntrance, setShowEntrance] = useState(
     !sessionStorage.getItem("mytrailer_visited")
   );
+  const [showConsent, setShowConsent]   = useState(false);
+  const [pendingPersona, setPendingPersona] = useState(null);
 
   /* ── Auth listener ─────────────────────────────────── */
   useEffect(() => {
@@ -70,8 +80,9 @@ export default function App() {
 
   const pingServer = async () => {
     try {
+      const headers = await getAuthHeaders();
       const res = await fetch(`${apiBase}/health`, {
-        headers: API_HEADERS,
+        headers,
         signal: AbortSignal.timeout(10000),
       });
       const data = await res.json();
@@ -79,16 +90,38 @@ export default function App() {
     } catch { setApiOk(false); }
   };
 
+  const hasConsented = () => localStorage.getItem("mytrailer_consent") === "true";
+
   const handleStart = async (personaId) => {
+    // Show consent modal if user hasn't agreed yet
+    if (!hasConsented()) {
+      setPendingPersona(personaId);
+      setShowConsent(true);
+      return;
+    }
+    await startSession(personaId);
+  };
+
+  const handleConsent = async () => {
+    localStorage.setItem("mytrailer_consent", "true");
+    setShowConsent(false);
+    if (pendingPersona) {
+      await startSession(pendingPersona);
+      setPendingPersona(null);
+    }
+  };
+
+  const startSession = async (personaId) => {
     if (!apiBase) {
       setSessionData({ error: "misconfigured", personaId, apiBase });
       setPage("chat");
       return;
     }
     try {
+      const headers = await getAuthHeaders();
       const res = await fetch(`${apiBase}/session/new`, {
         method: "POST",
-        headers: API_HEADERS,
+        headers,
         body: JSON.stringify({ persona_id: personaId }),
       });
       const data = await res.json();
@@ -181,7 +214,39 @@ export default function App() {
           sessionData={sessionData}
           onBack={handleBack}
           apiBase={apiBase}
+          getAuthHeaders={getAuthHeaders}
         />
+      )}
+      {showConsent && (
+        <div className="consent-overlay">
+          <div className="consent-modal">
+            <h2 className="consent-title">Before you start</h2>
+            <p className="consent-text">
+              Your conversations are <strong>private and encrypted</strong>.
+              We use your messages only to provide supportive responses — nothing
+              is shared with third parties.
+            </p>
+            <p className="consent-text">
+              MyTrailer is <strong>not a substitute</strong> for professional
+              mental health care. If you are in crisis, call <strong>988</strong> or
+              text <strong>HOME to 741741</strong>.
+            </p>
+            <p className="consent-text consent-text-small">
+              By continuing, you agree to our{" "}
+              <a href="/privacy" onClick={(e) => { e.preventDefault(); navigate("privacy"); setShowConsent(false); }}>Privacy Policy</a>
+              {" "}and{" "}
+              <a href="/terms" onClick={(e) => { e.preventDefault(); navigate("terms"); setShowConsent(false); }}>Terms of Service</a>.
+            </p>
+            <div className="consent-actions">
+              <button className="consent-cancel" onClick={() => { setShowConsent(false); setPendingPersona(null); }}>
+                Cancel
+              </button>
+              <button className="consent-agree" onClick={handleConsent}>
+                I Understand, Continue
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

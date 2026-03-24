@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { loadAllSessions, deleteSession } from "./storage";
 import "./landing.css";
 
 const PERSONAS = [
@@ -535,8 +536,6 @@ function PersonaIntroModal({ persona, onBack, onStart, loading }) {
   );
 }
 
-const STORAGE_KEY = "mytrailer_chat_sessions";
-
 function fmtSessionDate(iso) {
   const d = new Date(iso), now = new Date(), diff = now - d;
   if (diff < 86400000)  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -553,19 +552,19 @@ export default function LandingPage({ onStart, onResume, apiBase, apiOk, misconf
   const [activeTab, setActiveTab]     = useState("talk");
   const [showLogin, setShowLogin]     = useState(false);
   const [showIntro, setShowIntro]     = useState(false);
-  const [historyList, setHistoryList] = useState(() => {
-    try {
-      const all = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-      return Object.values(all).sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
-    } catch { return []; }
-  });
+  const [historyList, setHistoryList] = useState([]);
 
-  const deleteHistoryItem = (sessionId) => {
-    try {
-      const all = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-      delete all[sessionId];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-    } catch (e) { console.warn(e); }
+  // Load history from Supabase on mount
+  useEffect(() => {
+    loadAllSessions().then((all) => {
+      setHistoryList(
+        Object.values(all).sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt))
+      );
+    });
+  }, []);
+
+  const deleteHistoryItem = async (sessionId) => {
+    await deleteSession(sessionId);
     setHistoryList(prev => prev.filter(s => s.sessionId !== sessionId));
   };
   // Force light theme and remove toggle logic

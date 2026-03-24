@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { loadAllSessions, saveSession, deleteSession, clearAllSessions, formatDate } from "./storage";
 import "./chat.css";
 
 const API_HEADERS = {
@@ -136,65 +137,10 @@ function TypedText({ text, onDone }) {
   );
 }
 
-// ── Storage helpers ─────────────────────────────────────────────
-const STORAGE_KEY = "mytrailer_chat_sessions";
-
-function loadAllSessions() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
-  catch { return {}; }
-}
-
-function deleteSession(sessionId) {
-  try {
-    const all = loadAllSessions();
-    delete all[sessionId];
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-  } catch (e) {
-    console.warn("Storage error:", e);
-  }
-}
-
-function clearAllSessions() {
-  try { localStorage.removeItem(STORAGE_KEY); } catch (e) { console.warn(e); }
-}
-
-function saveSession(sessionId, personaId, messages) {
-  try {
-    const all = loadAllSessions();
-    all[sessionId] = {
-      sessionId,
-      personaId,
-      savedAt: new Date().toISOString(),
-      preview: messages.filter(m => m.role === "user").slice(-1)[0]?.content || "New session",
-      messages: messages.map(m => ({
-        ...m,
-        time: m.time instanceof Date ? m.time.toISOString() : m.time,
-      })),
-    };
-    const keys = Object.keys(all);
-    if (keys.length > 20) {
-      keys.sort((a, b) => new Date(all[a].savedAt) - new Date(all[b].savedAt));
-      delete all[keys[0]];
-    }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-  } catch (e) {
-    console.warn("Storage error:", e);
-  }
-}
-
-function formatDate(iso) {
-  const d = new Date(iso);
-  const now = new Date();
-  const diff = now - d;
-  if (diff < 86400000)
-    return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  if (diff < 604800000)
-    return d.toLocaleDateString([], { weekday: "short", hour: "2-digit", minute: "2-digit" });
-  return d.toLocaleDateString([], { month: "short", day: "numeric" });
-}
+// Storage helpers imported from ./storage
 
 // ── Component ───────────────────────────────────────────────────
-export default function ChatPage({ sessionData, onBack, apiBase }) {
+export default function ChatPage({ sessionData, onBack, apiBase, getAuthHeaders }) {
   const isOffline  = !!sessionData.error;
   const isResumed  = !!sessionData.resumedMessages;
   const offlineMsg = sessionData.error === "misconfigured"
@@ -241,10 +187,10 @@ export default function ChatPage({ sessionData, onBack, apiBase }) {
     return () => clearInterval(t);
   }, []);
 
-  // Save to localStorage whenever messages update
+  // Save to Supabase whenever messages update
   useEffect(() => {
     if (messages.length > 1)
-      saveSession(sessionData.session_id, sessionData.personaId, messages);
+      saveSession(sessionData.session_id, sessionData.personaId, messages).catch(() => {});
   }, [messages]);
 
   // Auto-resize textarea height as content grows
@@ -255,8 +201,8 @@ export default function ChatPage({ sessionData, onBack, apiBase }) {
     el.style.height = Math.min(el.scrollHeight, 120) + "px";
   };
 
-  const openHistory = () => {
-    setPastSessions(loadAllSessions());
+  const openHistory = async () => {
+    setPastSessions(await loadAllSessions());
     setShowHistory(true);
   };
 
@@ -285,9 +231,10 @@ export default function ChatPage({ sessionData, onBack, apiBase }) {
     }]);
 
     try {
+      const headers = getAuthHeaders ? await getAuthHeaders() : API_HEADERS;
       const res = await fetch(`${apiBase}/chat`, {
         method: "POST",
-        headers: API_HEADERS,
+        headers,
         body: JSON.stringify({
           session_id: sessionData.session_id,
           message: trimmed,
@@ -426,8 +373,8 @@ export default function ChatPage({ sessionData, onBack, apiBase }) {
                 {Object.values(pastSessions).length > 0 && (
                   <button
                     className="history-clear-btn"
-                    onClick={() => {
-                      clearAllSessions();
+                    onClick={async () => {
+                      await clearAllSessions();
                       setPastSessions({});
                       setHistorySearch("");
                     }}
@@ -504,8 +451,8 @@ export default function ChatPage({ sessionData, onBack, apiBase }) {
                       <button
                         className="history-item-delete"
                         title="Delete"
-                        onClick={() => {
-                          deleteSession(session.sessionId);
+                        onClick={async () => {
+                          await deleteSession(session.sessionId);
                           setPastSessions(prev => {
                             const next = { ...prev };
                             delete next[session.sessionId];
