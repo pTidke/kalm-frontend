@@ -123,6 +123,16 @@ export default function App() {
         headers,
         body: JSON.stringify({ persona_id: personaId }),
       });
+      if (res.status === 429) {
+        setSessionData({ error: "rate_limited", personaId, apiBase });
+        setPage("chat");
+        return;
+      }
+      if (!res.ok) {
+        setSessionData({ error: "service_unavailable", personaId, apiBase });
+        setPage("chat");
+        return;
+      }
       const data = await res.json();
       setSessionData({ ...data, personaId, apiBase });
       setPage("chat");
@@ -207,6 +217,8 @@ export default function App() {
           user={user}
           onSignOut={handleSignOut}
           onBack={() => navigate("landing")}
+          apiBase={apiBase}
+          getAuthHeaders={getAuthHeaders}
         />
       ) : (
         <ChatPage
@@ -221,9 +233,10 @@ export default function App() {
           <div className="consent-modal">
             <h2 className="consent-title">Before you start</h2>
             <p className="consent-text">
-              Your conversations are <strong>private and encrypted</strong>.
-              We use your messages only to provide supportive responses — nothing
-              is shared with third parties.
+              Your conversations are <strong>encrypted</strong> before storage.
+              Messages are processed by <strong>Microsoft Azure OpenAI</strong> to
+              generate responses. No data is shared beyond what is needed for this
+              purpose. You can export or delete your data at any time from your profile.
             </p>
             <p className="consent-text">
               MyTrailer is <strong>not a substitute</strong> for professional

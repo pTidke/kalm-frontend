@@ -51,20 +51,21 @@ export default function PrivacyPage({ onBack }) {
         <h2>Data Storage and Security</h2>
         <ul>
           <li>Authentication data is managed by Supabase with encryption at rest (AES-256) and in transit (TLS/SSL)</li>
-          <li>Chat history is currently stored locally on your device using browser storage</li>
-          <li>We do not store your conversation content on our servers beyond what is needed to generate a response</li>
+          <li>Chat messages are encrypted at the application level (AES-128 / Fernet) before being stored in our database</li>
+          <li>Chat history is also cached locally on your device for quick access</li>
           <li>All data transmission uses HTTPS encryption</li>
         </ul>
 
-        <h2>Data Sharing</h2>
+        <h2>Data Sharing and Processing</h2>
         <p>
           We do not sell, rent, or share your personal information with third
-          parties. Your conversations are private. We only use the following
+          parties. Your conversations are private. We use the following
           third-party services to operate the app:
         </p>
         <ul>
           <li>Google (authentication only)</li>
           <li>Supabase (authentication and data management)</li>
+          <li><strong>Microsoft Azure OpenAI</strong> (AI processing — your messages are sent to generate supportive responses)</li>
           <li>Vercel (frontend hosting)</li>
           <li>Render (backend hosting)</li>
         </ul>
@@ -72,8 +73,8 @@ export default function PrivacyPage({ onBack }) {
         <h2>Your Rights</h2>
         <p>You have the right to:</p>
         <ul>
-          <li>Access the personal data we hold about you</li>
-          <li>Delete your account and all associated data</li>
+          <li>Export all your data from your profile settings</li>
+          <li>Permanently delete all your data from your profile settings</li>
           <li>Clear your local chat history at any time</li>
           <li>Withdraw consent by signing out and discontinuing use</li>
         </ul>

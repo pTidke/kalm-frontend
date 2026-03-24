@@ -144,6 +144,8 @@ export default function ChatPage({ sessionData, onBack, apiBase, getAuthHeaders 
   const isResumed  = !!sessionData.resumedMessages;
   const offlineMsg = sessionData.error === "misconfigured"
     ? "MyTrailer isn't configured correctly. The API URL is missing — check your environment settings."
+    : sessionData.error === "rate_limited"
+    ? "Too many requests — please wait a minute and try again."
     : "Service is unavailable right now. The server couldn't be reached. Try again in a moment, or check your connection.";
 
   const [messages, setMessages] = useState(() => {
@@ -239,17 +241,32 @@ export default function ChatPage({ sessionData, onBack, apiBase, getAuthHeaders 
           message: trimmed,
         }),
       });
-      const data = await res.json();
-      setMessages(prev => [...prev, {
-        id: Date.now() + 1,
-        role: "assistant",
-        content: data.reply,
-        typing: true,
-        time: new Date(),
-      }]);
-      setAlgeeStage(data.algee_stage_name || "approach");
-      setSafetyLevel(data.safety_level || 0);
-      if (data.crisis_resources) setShowCrisis(true);
+
+      if (!res.ok) {
+        const errorMsg =
+          res.status === 429 ? "Easy — too many messages at once. Take a breath and try again in a minute." :
+          res.status === 401 ? "Session expired. Head back and sign in again." :
+          res.status === 403 ? "Not authorized for this session." :
+          res.status === 404 ? "Session not found. Head back and start a new one." :
+          "Something went wrong. Try again.";
+        setLastFailedText(res.status === 429 ? trimmed : null);
+        setMessages(prev => [...prev, {
+          id: Date.now() + 1, role: "assistant", content: errorMsg,
+          time: new Date(), error: true,
+        }]);
+      } else {
+        const data = await res.json();
+        setMessages(prev => [...prev, {
+          id: Date.now() + 1,
+          role: "assistant",
+          content: data.reply,
+          typing: true,
+          time: new Date(),
+        }]);
+        setAlgeeStage(data.algee_stage_name || "approach");
+        setSafetyLevel(data.safety_level || 0);
+        if (data.crisis_resources) setShowCrisis(true);
+      }
     } catch {
       setLastFailedText(trimmed);
       setMessages(prev => [...prev, {
@@ -349,7 +366,7 @@ export default function ChatPage({ sessionData, onBack, apiBase, getAuthHeaders 
             construction mental health research.
           </p>
           <p>
-            Conversations stay on this device. MyTrailer is{" "}
+            Conversations are encrypted and stored securely. MyTrailer is{" "}
             <strong>not a substitute</strong> for professional care.
             In crisis, call or text <strong>988</strong>.
           </p>
@@ -637,7 +654,7 @@ export default function ChatPage({ sessionData, onBack, apiBase, getAuthHeaders 
           </div>
         )}
         <div className="input-footer">
-          <span>Private · Stays on your device</span>
+          <span>Private · Encrypted</span>
           <span className="input-footer-dot">·</span>
           <span>Crisis: call or text <strong>988</strong></span>
         </div>

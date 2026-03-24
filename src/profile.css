@@ -214,6 +214,31 @@
   transform: translateX(20px);
 }
 
+/* ── Export button ─────────────────────────────────────── */
+.profile-export-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 10px 16px;
+  background: rgba(74, 111, 165, 0.08);
+  border: 1px solid rgba(74, 111, 165, 0.2);
+  border-radius: 10px;
+  color: #4A6FA5;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.profile-export-btn:hover {
+  background: rgba(74, 111, 165, 0.15);
+}
+.profile-export-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* ── Danger zone ───────────────────────────────────────── */
 .profile-section-danger {
   border-color: rgba(239, 68, 68, 0.15);
