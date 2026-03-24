@@ -1,106 +1,95 @@
 import { supabase } from "./supabase";
 
-const EXPIRE_DAYS = 30;
-
-/* ── Auto-expire sessions older than 30 days ─────────────── */
-async function expireOldSessions() {
-  const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate() - EXPIRE_DAYS);
-
-  const { error } = await supabase
-    .from("chat_sessions")
-    .delete()
-    .lt("updated_at", cutoff.toISOString());
-
-  if (error) console.warn("Expire sessions error:", error.message);
-}
-
 /* ── Check if user has opted in to saving history ────────── */
 export function isSaveHistoryEnabled() {
   return localStorage.getItem("mytrailer_save_history") !== "false";
 }
 
-/* ── Load all sessions for the current user ──────────────── */
-export async function loadAllSessions() {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return {};
+/* ── API helpers ─────────────────────────────────────────── */
 
-  // Clean up expired sessions on each load
-  await expireOldSessions();
-
-  const { data, error } = await supabase
-    .from("chat_sessions")
-    .select("*")
-    .order("updated_at", { ascending: false });
-
-  if (error) {
-    console.warn("Load sessions error:", error.message);
-    return {};
+async function apiHeaders() {
+  const headers = { "Content-Type": "application/json" };
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session?.access_token) {
+    headers["Authorization"] = `Bearer ${session.access_token}`;
   }
-
-  const result = {};
-  for (const row of data) {
-    result[row.session_id] = {
-      sessionId: row.session_id,
-      personaId: row.persona_id,
-      savedAt: row.updated_at,
-      preview: row.preview,
-      messages: row.messages,
-    };
-  }
-  return result;
+  return headers;
 }
 
-/* ── Save or update a session ────────────────────────────── */
-export async function saveSession(sessionId, personaId, messages) {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return;
+function getApiBase() {
+  return (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+}
 
-  const preview =
-    messages.filter((m) => m.role === "user").slice(-1)[0]?.content ||
-    "New session";
+/* ── Load all sessions from backend API ──────────────────── */
+export async function loadAllSessions() {
+  const apiBase = getApiBase();
+  if (!apiBase) return {};
 
-  const cleanMessages = messages.map((m) => ({
-    ...m,
-    time: m.time instanceof Date ? m.time.toISOString() : m.time,
-  }));
+  try {
+    const headers = await apiHeaders();
+    const res = await fetch(`${apiBase}/sessions`, { headers });
+    if (!res.ok) return {};
 
-  const { error } = await supabase
-    .from("chat_sessions")
-    .upsert(
-      {
-        user_id: user.id,
-        session_id: sessionId,
-        persona_id: personaId,
-        preview,
-        messages: cleanMessages,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "session_id" }
-    );
-
-  if (error) console.warn("Save session error:", error.message);
-
-  // Keep last 20 sessions — delete oldest if over limit
-  const { data: all } = await supabase
-    .from("chat_sessions")
-    .select("id, updated_at")
-    .order("updated_at", { ascending: false });
-
-  if (all && all.length > 20) {
-    const toDelete = all.slice(20).map((r) => r.id);
-    await supabase.from("chat_sessions").delete().in("id", toDelete);
+    const { sessions } = await res.json();
+    const result = {};
+    for (const s of sessions) {
+      result[s.session_id] = {
+        sessionId: s.session_id,
+        personaId: s.persona_id,
+        savedAt: s.updated_at,
+        preview: s.preview,
+        messages: null, // Loaded on demand via loadSessionMessages
+      };
+    }
+    return result;
+  } catch {
+    console.warn("Failed to load sessions from API");
+    return {};
   }
+}
+
+/* ── Load messages for a specific session from backend ───── */
+export async function loadSessionMessages(sessionId) {
+  const apiBase = getApiBase();
+  if (!apiBase) return null;
+
+  try {
+    const headers = await apiHeaders();
+    const res = await fetch(`${apiBase}/sessions/${sessionId}/messages`, { headers });
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    return {
+      sessionId: data.session_id,
+      personaId: data.persona_id,
+      messages: data.messages.map((m) => ({
+        id: Date.now() + Math.random(),
+        role: m.role,
+        content: m.content,
+        time: m.time,
+      })),
+    };
+  } catch {
+    console.warn("Failed to load session messages");
+    return null;
+  }
+}
+
+/* ── Save session — backend handles this via /chat, this is now a no-op ── */
+export async function saveSession() {
+  // Messages are persisted by the backend on each /chat call.
+  // No separate save needed.
 }
 
 /* ── Delete a single session ─────────────────────────────── */
 export async function deleteSession(sessionId) {
-  const { error } = await supabase
+  // Frontend-side: clear from legacy table if it exists
+  await supabase
     .from("chat_sessions")
     .delete()
-    .eq("session_id", sessionId);
-
-  if (error) console.warn("Delete session error:", error.message);
+    .eq("session_id", sessionId)
+    .then(() => {})
+    .catch(() => {});
 }
 
 /* ── Delete all sessions for current user ────────────────── */
@@ -108,6 +97,7 @@ export async function clearAllSessions() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return;
 
+  // Clear legacy frontend table
   const { error } = await supabase
     .from("chat_sessions")
     .delete()
@@ -116,7 +106,7 @@ export async function clearAllSessions() {
   if (error) console.warn("Clear sessions error:", error.message);
 }
 
-/* ── Format date (unchanged, not async) ──────────────────── */
+/* ── Format date (unchanged) ─────────────────────────────── */
 export function formatDate(iso) {
   const d = new Date(iso);
   const now = new Date();

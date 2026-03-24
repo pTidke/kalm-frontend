@@ -147,7 +147,7 @@ export default function App() {
       session_id: session.sessionId,
       personaId:  session.personaId,
       apiBase,
-      resumedMessages: session.messages,
+      resumeFromApi: true,
     });
     setPage("chat");
   };

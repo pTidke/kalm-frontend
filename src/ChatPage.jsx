@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { loadAllSessions, saveSession, deleteSession, clearAllSessions, formatDate, isSaveHistoryEnabled } from "./storage";
+import { loadAllSessions, loadSessionMessages, deleteSession, clearAllSessions, formatDate } from "./storage";
 import "./chat.css";
 
 const API_HEADERS = {
@@ -141,7 +141,7 @@ function TypedText({ text, onDone }) {
 // ── Component ───────────────────────────────────────────────────
 export default function ChatPage({ sessionData, onBack, apiBase, getAuthHeaders }) {
   const isOffline  = !!sessionData.error;
-  const isResumed  = !!sessionData.resumedMessages;
+  const isResumed  = !!sessionData.resumeFromApi;
   const offlineMsg = sessionData.error === "misconfigured"
     ? "MyTrailer isn't configured correctly. The API URL is missing — check your environment settings."
     : sessionData.error === "rate_limited"
@@ -149,16 +149,28 @@ export default function ChatPage({ sessionData, onBack, apiBase, getAuthHeaders 
     : "Service is unavailable right now. The server couldn't be reached. Try again in a moment, or check your connection.";
 
   const [messages, setMessages] = useState(() => {
-    if (isResumed)
-      return sessionData.resumedMessages.map(m => ({ ...m, time: new Date(m.time) }));
+    if (isResumed) return []; // Will be loaded from API in useEffect
     return [{ id: 1, role: "assistant", content: isOffline ? offlineMsg : sessionData.greeting, time: new Date() }];
   });
   const [input, setInput]               = useState("");
-  const [loading, setLoading]           = useState(false);
+  const [loading, setLoading]           = useState(isResumed); // Show loading while fetching resumed messages
   const [algeeStage, setAlgeeStage]     = useState("approach");
   const [safetyLevel, setSafetyLevel]   = useState(0);
   const [showCrisis, setShowCrisis]     = useState(false);
   const [showStarters, setShowStarters] = useState(!isOffline && !isResumed);
+
+  // Load messages from backend when resuming a session
+  useEffect(() => {
+    if (!isResumed) return;
+    loadSessionMessages(sessionData.session_id).then((data) => {
+      if (data?.messages?.length) {
+        setMessages(data.messages.map(m => ({ ...m, time: new Date(m.time) })));
+      } else {
+        setMessages([{ id: 1, role: "assistant", content: "Couldn't load the previous conversation.", time: new Date(), error: true }]);
+      }
+      setLoading(false);
+    });
+  }, []);
   const [showInfo, setShowInfo]         = useState(false);
   const [showHistory, setShowHistory]   = useState(false);
   const [pastSessions, setPastSessions] = useState({});
@@ -188,11 +200,7 @@ export default function ChatPage({ sessionData, onBack, apiBase, getAuthHeaders 
     return () => clearInterval(t);
   }, []);
 
-  // Save to Supabase whenever messages update (if user opted in)
-  useEffect(() => {
-    if (messages.length > 1 && isSaveHistoryEnabled())
-      saveSession(sessionData.session_id, sessionData.personaId, messages).catch(() => {});
-  }, [messages]);
+  // Messages are now persisted by the backend on each /chat call — no frontend save needed.
 
   // Auto-resize textarea height as content grows
   const resizeTextarea = () => {
@@ -207,10 +215,13 @@ export default function ChatPage({ sessionData, onBack, apiBase, getAuthHeaders 
     setShowHistory(true);
   };
 
-  const loadSession = (session) => {
-    setMessages(session.messages.map(m => ({ ...m, time: new Date(m.time) })));
-    setShowHistory(false);
-    setShowStarters(false);
+  const loadSession = async (session) => {
+    const data = await loadSessionMessages(session.sessionId);
+    if (data?.messages) {
+      setMessages(data.messages.map(m => ({ ...m, time: new Date(m.time) })));
+      setShowHistory(false);
+      setShowStarters(false);
+    }
   };
 
   const send = useCallback(async (text) => {
