@@ -472,7 +472,7 @@ export default function ChatPage({ sessionData, onBack, apiBase, getAuthHeaders 
                             <span className="history-item-time">{formatDate(session.savedAt)}</span>
                           </div>
                           <div className="history-item-preview">{session.preview}</div>
-                          <div className="history-item-count">{session.messages.length} messages</div>
+                          <div className="history-item-count">{session.messages?.length || 0} messages</div>
                         </div>
                       </button>
                       <button

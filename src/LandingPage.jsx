@@ -830,7 +830,7 @@ export default function LandingPage({ onStart, onResume, apiBase, apiOk, misconf
                       </div>
                       <div className="hhc-right">
                         <span className="hhc-time">{fmtSessionDate(session.savedAt)}</span>
-                        <span className="hhc-count">{session.messages.length} msgs</span>
+                        <span className="hhc-count">{session.messages?.length || 0} msgs</span>
                       </div>
                     </button>
                     <button
