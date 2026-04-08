@@ -40,7 +40,14 @@ export default function App() {
     !sessionStorage.getItem("mytrailer_visited")
   );
   const [showConsent, setShowConsent]   = useState(false);
+  const [theme, setTheme]             = useState(localStorage.getItem("kalm_theme") || "light");
   const [pendingPersona, setPendingPersona] = useState(null);
+
+  /* ── Apply Theme ───────────────────────────────────── */
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("kalm_theme", theme);
+  }, [theme]);
 
   /* ── Auth listener ─────────────────────────────────── */
   useEffect(() => {
@@ -211,6 +218,8 @@ export default function App() {
           onSignOut={handleSignOut}
           onProfileClick={() => navigate("profile")}
           onNavigate={navigate}
+          theme={theme}
+          onThemeChange={setTheme}
         />
       ) : page === "profile" ? (
         <ProfilePage

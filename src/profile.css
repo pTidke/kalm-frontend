@@ -64,7 +64,7 @@
   height: 88px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid rgba(74, 111, 165, 0.3);
+  border: 3px solid var(--border-active);
 }
 
 .profile-avatar-fallback {
@@ -74,7 +74,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(74, 111, 165, 0.15);
+  background: var(--bg-surface);
   color: var(--text-primary);
   font-family: "Montserrat", sans-serif;
   font-size: 2rem;
@@ -196,7 +196,7 @@
 }
 
 .profile-toggle.on {
-  background: #4A6FA5;
+  background: var(--steel);
 }
 
 .profile-toggle-knob {
@@ -232,7 +232,7 @@
   transition: background 0.2s;
 }
 .profile-export-btn:hover {
-  background: rgba(74, 111, 165, 0.15);
+  background: var(--bg-surface);
 }
 .profile-export-btn:disabled {
   opacity: 0.6;
@@ -324,14 +324,4 @@
   cursor: not-allowed;
 }
 
-/* Light mode */
-:root[data-theme="light"] .profile-header {
-  border-bottom-color: rgba(0, 0, 0, 0.08);
-}
-:root[data-theme="light"] .profile-back-btn:hover {
-  background: rgba(0, 0, 0, 0.06);
-}
-:root[data-theme="light"] .profile-section {
-  background: rgba(0, 0, 0, 0.02);
-  border-color: rgba(0, 0, 0, 0.08);
-}
+/* Light mode overrides handled by variables in index.css */

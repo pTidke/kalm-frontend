@@ -385,9 +385,21 @@ function LoginModal({ onClose }) {
   );
 }
 
+const THEMES = [
+  { id: "light",      label: "Paper",       color: "#4a6fa5" },
+  { id: "clay",       label: "Clay",        color: "#bc6c4d" },
+  { id: "mint",       label: "Mint",        color: "#45b09e" },
+  { id: "midnight",   label: "Midnight",    color: "#38bdf8" },
+  { id: "steel",      label: "Steel",       color: "#facc15" },
+  { id: "ultraviolet",label: "Ultraviolet", color: "#ff007f" },
+  { id: "solar",      label: "Solar",       color: "#fbbf24" },
+  { id: "frost",      label: "Frost",       color: "#3b82f6" },
+];
+
 /* ── Top Nav Bar ──────────────────────────────────────────── */
-function TopBar({ activeTab, onTabChange, apiOk, misconfig, user, onSignIn, onProfileClick }) {
+function TopBar({ activeTab, onTabChange, apiOk, misconfig, user, onSignIn, onProfileClick, theme, onThemeChange }) {
   const [scrolled, setScrolled] = useState(false);
+  const [showThemes, setShowThemes] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -423,6 +435,24 @@ function TopBar({ activeTab, onTabChange, apiOk, misconfig, user, onSignIn, onPr
 
         {/* Right cluster */}
         <div className="topbar-actions">
+          {/* Theme switcher — horizontal list for visibility */}
+          <div className="theme-switcher-row">
+            <span className="theme-row-label">THEME</span>
+            <div className="theme-dots-wrap">
+              {THEMES.map((t) => (
+                <button
+                  key={t.id}
+                  className={`theme-dot-btn ${theme === t.id ? "active" : ""}`}
+                  onClick={() => onThemeChange(t.id)}
+                  title={t.label}
+                  aria-label={`Switch to ${t.label} theme`}
+                >
+                  <span className="theme-color-dot" style={{ background: t.color }} />
+                </button>
+              ))}
+            </div>
+          </div>
+
           {apiOk === false && (
             <div className="api-warning">
               {misconfig ? "⚠ VITE_API_URL not set" : "⚠ Not connected"}
@@ -544,7 +574,7 @@ function fmtSessionDate(iso) {
 }
 
 /* ── Main Component ───────────────────────────────────────── */
-export default function LandingPage({ onStart, onResume, apiBase, apiOk, misconfig, user, onSignIn, onSignOut, onProfileClick, onNavigate }) {
+export default function LandingPage({ onStart, onResume, apiBase, apiOk, misconfig, user, onSignIn, onSignOut, onProfileClick, onNavigate, theme, onThemeChange }) {
   const [selected, setSelected]       = useState("mack");
   const [expanded, setExpanded]       = useState("mack");
   const [loading, setLoading]         = useState(false);
@@ -553,7 +583,6 @@ export default function LandingPage({ onStart, onResume, apiBase, apiOk, misconf
   const [showLogin, setShowLogin]     = useState(false);
   const [showIntro, setShowIntro]     = useState(false);
   const [historyList, setHistoryList] = useState([]);
-
   // Load history from Supabase on mount
   useEffect(() => {
     loadAllSessions().then((all) => {
@@ -567,10 +596,6 @@ export default function LandingPage({ onStart, onResume, apiBase, apiOk, misconf
     await deleteSession(sessionId);
     setHistoryList(prev => prev.filter(s => s.sessionId !== sessionId));
   };
-  // Force light theme and remove toggle logic
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", "light");
-  }, []);
 
   useEffect(() => { setVisible(true); }, []);
 
@@ -616,6 +641,8 @@ export default function LandingPage({ onStart, onResume, apiBase, apiOk, misconf
             user={user}
             onSignIn={onSignIn}
             onProfileClick={onProfileClick}
+            theme={theme}
+            onThemeChange={onThemeChange}
           />
           <main className="tab-content">
             <header className="tab-header">
@@ -696,6 +723,8 @@ export default function LandingPage({ onStart, onResume, apiBase, apiOk, misconf
           user={user}
           onSignIn={onSignIn}
           onProfileClick={onProfileClick}
+          theme={theme}
+          onThemeChange={onThemeChange}
         />
 
         <main className="hero">
