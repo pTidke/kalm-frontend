@@ -435,7 +435,7 @@ function TopBar({ activeTab, onTabChange, apiOk, misconfig, user, onSignIn, onPr
 
         {/* Right cluster */}
         <div className="topbar-actions">
-          {/* Theme switcher — horizontal list for visibility */}
+          {/* Theme switcher — horizontal list for visibility 
           <div className="theme-switcher-row">
             <span className="theme-row-label">THEME</span>
             <div className="theme-dots-wrap">
@@ -451,7 +451,7 @@ function TopBar({ activeTab, onTabChange, apiOk, misconfig, user, onSignIn, onPr
                 </button>
               ))}
             </div>
-          </div>
+          </div>*/}
 
           {apiOk === false && (
             <div className="api-warning">
